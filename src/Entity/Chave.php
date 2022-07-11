@@ -3,6 +3,10 @@
 namespace Emprestimo\Chaves\Entity;
 
 use Emprestimo\Chaves\Entity\Predio;
+use Emprestimo\Chaves\Entity\Emprestimo;
+
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
 /**
  * @Entity
@@ -13,7 +17,7 @@ class Chave
     /**
      * @Id
      * @GeneratedValue
-     * @Column(type="integer", name="id_chave", options={"comment":"Identificador da chave."})
+     * @Column(type="integer")
      */
     private $id;
  	/** 
@@ -30,9 +34,28 @@ class Chave
     private $flAtivo;
 	/**
 	 * @ManyToOne(targetEntity="Predio", fetch="LAZY")
+     * @Column(type="integer", name="id_predio", nullable=false, options={"comment":"Identificador do prédio."})
 	 */
-	private $predio;
+	private $predio;   
+    /**
+ 	 * @OneToMany(targetEntity="Emprestimo", mappedBy="emprestimos")
+ 	 */
+	private $emprestimos;
 
+    public function __construct() {
+		$this->emprestimos = new ArrayCollection();
+	}
+
+    public function getId(): int
+    {
+        return $this->id;
+    }
+
+    public function setId(int $id): void
+    {
+        $this->id = $id;
+    }
+    
 	public function setNumero(string $v): void
     {
         $this->numero = $v;
@@ -75,4 +98,15 @@ class Chave
     {
         return $this->flAtivo == 'S';
     }
+
+    public function addEmprestimo(Emprestimo $emprestimo):  void {
+	    if (!$this->emprestimos->contains($emprestimo)) {
+    		$this->emprestimos->add($emprestimo);
+    		$emprestimo->setChave($this);
+		}
+	}
+
+	public function getEmprestimos(): Collection {
+    	return $this->emprestimos;
+	}
 }

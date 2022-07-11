@@ -3,6 +3,12 @@
 namespace Emprestimo\Chaves\Entity;
 
 use Emprestimo\Chaves\Entity\Predio;
+use Emprestimo\Chaves\Entity\Emprestimo;
+use Emprestimo\Chaves\Entity\Instituicao;
+
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+
 
 /**
  * @Entity
@@ -13,7 +19,7 @@ class Usuario
     /**
      * @Id
      * @GeneratedValue
-     * @Column(type="integer", name="id_usuario", options={"comment":"Identificador do usuário."})
+     * @Column(type="integer")
      */
     private $id;
     /**
@@ -25,7 +31,7 @@ class Usuario
      */
     private $senha;
     /** 
-     * @Column(type="string", name="nome", unique=true, length=255, nullable=false, options={"comment":"Nome do usuário."})
+     * @Column(type="string", name="nome", unique=false, length=255, nullable=false, options={"comment":"Nome do usuário."})
      */
     private $nome;
     /** 
@@ -44,16 +50,44 @@ class Usuario
      * @Column(type="string", name="fl_ativo", columnDefinition="CHAR(1) NOT NULL", options={"comment":"FLag que define se o usuário ainda está ativo."})
      */
     private $flAtivo;
+    /** 
+     * @Column(type="string", name="email", nullable=false, options={"comment":"E-mail do usuário."})
+     */
+    private $email;
     /**
      * @ManyToMany(targetEntity="Predio", inversedBy="usuarios", cascade={"persist"})
-     * @JoinTable(name="usuarios_predios", schema="chaves")
+     * @JoinTable(name="usuarios_predios", schema="chaves")     * 
      */
 	private $predios;
+    /**
+ 	 * @OneToMany(targetEntity="Emprestimo", mappedBy="$emprestimosEmprestimo")
+ 	 */
+	private $emprestimosEmprestimo;
+    /**
+ 	 * @OneToMany(targetEntity="Emprestimo", mappedBy="$emprestimosDevolucao")
+ 	 */
+	private $emprestimosDevolucao;
+    /**
+	 * @ManyToOne(targetEntity="Instituicao", fetch="LAZY")
+	 */
+	private $instituicao;
 
     public function __construct() {
-        $this->predios = new ArrayCollection();
+	    $this->predios = new ArrayCollection();
+    	$this->emprestimosEmprestimo = new ArrayCollection();
+		$this->emprestimosDevolucao = new ArrayCollection();
+	}
+
+    public function getId(): int
+    {
+        return $this->id;
     }
 
+    public function setId(int $id): void
+    {
+        $this->id = $id;
+    }
+    
     public function setLogin(string $v): void
     {
         $this->login = $v;
@@ -114,6 +148,16 @@ class Usuario
         return $this->observacao;
     }
 
+    public function setEmail(string $v): void
+    {
+        $this->email = $v;
+    }
+
+    public function getEmail(): string
+    {
+        return $this->email;
+    }
+
     public function setValidade(string $v): void
     {
         $this->validade = $v;
@@ -148,5 +192,35 @@ class Usuario
 
 	public function getPredios() {
     	return $this->predios;
+	}
+
+    public function addEmprestimoEmprestimo(Emprestimo $emprestimo):  void {
+	    if (!$this->emprestimosEmprestimo->contains($emprestimo)) {
+    		$this->emprestimosEmprestimo->add($emprestimo);
+    		$emprestimo->setUsuarioEmprestimo($this);
+		}
+	}
+
+	public function getEmprestimosEmprestimo(): Collection {
+    	return $this->emprestimosEmprestimo;
+	}
+
+    public function addEmprestimoDevolucao(Emprestimo $emprestimo):  void {
+	    if (!$this->emprestimosDevolucao->contains($emprestimo)) {
+    		$this->emprestimosDevolucao->add($emprestimo);
+    		$emprestimo->setUsuarioDevolucao($this);
+		}
+	}
+
+	public function getEmprestimosDevolucao(): Collection {
+    	return $this->emprestimosDevolucao;
+	}
+
+    public function getInstituicao(): Instituicao {
+		return $this->instituicao;
+	}
+
+	public function setInstituicao(Instituicao $instituicao): void {
+		$this->instituicao = $instituicao;
 	}
 }
