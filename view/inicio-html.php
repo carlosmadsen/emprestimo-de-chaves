@@ -7,22 +7,42 @@
 </head>
 <body>
 
-<?php if (isset($_SESSION['logado'])) : ?>
-<nav class="navbar navbar-dark bg-dark mb-2">
-    <a class="navbar-brand" href="/listar-cursos">Home</a>
+<?php if (isset($_SESSION['usuario'])) : ?>
 
-    <ul class="navbar-nav ml-auto">
-        <li class="nav-item active">
-            <a class="nav-link" href="/logout">Sair</a>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link" href="/instituicao">Instituição</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/usuarios">Usuários</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/predios">Prédios</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/chaves">Chaves</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/emprestimos">Empréstimos</a>
+        </li>
+      </ul>   
+         
+     <ul class="navbar-nav ml-auto">
+        <li class="nav-item">
+               <a class="nav-link" href="/logout">Sair</a>
         </li>
     </ul>
+
+    </div>
 </nav>
 <?php endif; ?>
 
-<div class="container">
-    <div class="jumbotron">
-        <h1><?= $titulo; ?></h1>
-    </div> 
+<div class="container" >
+    <div style="margin-top: 25px; margin-bottom: 25px;" >
+        <h2><?= $titulo; ?></h2>
+    </div>
 
      <?php if (isset($_SESSION['mensagem'])): ?>
     <div class="alert alert-<?= $_SESSION['tipo_mensagem']; ?>">

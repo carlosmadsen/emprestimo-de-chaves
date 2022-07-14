@@ -54,29 +54,28 @@ class Usuario
      * @Column(type="string", name="email", nullable=false, options={"comment":"E-mail do usuário."})
      */
     private $email;
-    /**
-     * @ManyToMany(targetEntity="Predio", inversedBy="usuarios", cascade={"persist"})
-     * @JoinTable(name="usuarios_predios", schema="chaves")     * 
-     */
-	private $predios;
+    
+    //  @ManyToMany(targetEntity="Predio", inversedBy="usuarios", cascade={"persist"})
+    // @JoinTable(name="usuarios_predios", schema="chaves")     * 
+     
+	//private $predios;
     /**
  	 * @OneToMany(targetEntity="Emprestimo", mappedBy="$emprestimosEmprestimo")
  	 */
-	private $emprestimosEmprestimo;
+	//private $emprestimosEmprestimo;
+    // @OneToMany(targetEntity="Emprestimo", mappedBy="$emprestimosDevolucao")
+ 	//private $emprestimosDevolucao;
+    
     /**
- 	 * @OneToMany(targetEntity="Emprestimo", mappedBy="$emprestimosDevolucao")
- 	 */
-	private $emprestimosDevolucao;
-    /**
-	 * @ManyToOne(targetEntity="Instituicao", fetch="LAZY")
-	 */
+     * @ManyToOne(targetEntity="Instituicao", inversedBy="usuarios")
+     */  
 	private $instituicao;
 
-    public function __construct() {
+    /*public function __construct() {
 	    $this->predios = new ArrayCollection();
     	$this->emprestimosEmprestimo = new ArrayCollection();
 		$this->emprestimosDevolucao = new ArrayCollection();
-	}
+	}*/
 
     public function getId(): int
     {
@@ -95,7 +94,7 @@ class Usuario
 
     public function getLogin(): string
     {
-        return $this->senha;
+        return $this->login;
     }
 
     public function setSenha(string $v): void
@@ -183,38 +182,38 @@ class Usuario
         return $this->flAtivo == 'S';
     }
 
-    public function addPredio(Predio $predio) {
+    /*public function addPredio(Predio $predio) {
 		if (!$this->predios->contains($predio)) {
             $this->predios->add($predio);
 		    $predio->addUsuario($this);
         }
-   }
+   }*/
 
-	public function getPredios() {
+	/*public function getPredios() {
     	return $this->predios;
-	}
+	}*/
 
-    public function addEmprestimoEmprestimo(Emprestimo $emprestimo):  void {
+    /*public function addEmprestimoEmprestimo(Emprestimo $emprestimo):  void {
 	    if (!$this->emprestimosEmprestimo->contains($emprestimo)) {
     		$this->emprestimosEmprestimo->add($emprestimo);
     		$emprestimo->setUsuarioEmprestimo($this);
 		}
-	}
+	}*/
 
-	public function getEmprestimosEmprestimo(): Collection {
+	/*public function getEmprestimosEmprestimo(): Collection {
     	return $this->emprestimosEmprestimo;
-	}
+	}*/
 
-    public function addEmprestimoDevolucao(Emprestimo $emprestimo):  void {
+    /*public function addEmprestimoDevolucao(Emprestimo $emprestimo):  void {
 	    if (!$this->emprestimosDevolucao->contains($emprestimo)) {
     		$this->emprestimosDevolucao->add($emprestimo);
     		$emprestimo->setUsuarioDevolucao($this);
 		}
-	}
+	}*/
 
-	public function getEmprestimosDevolucao(): Collection {
+	/*public function getEmprestimosDevolucao(): Collection {
     	return $this->emprestimosDevolucao;
-	}
+	}*/
 
     public function getInstituicao(): Instituicao {
 		return $this->instituicao;

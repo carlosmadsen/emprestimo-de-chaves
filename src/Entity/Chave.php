@@ -36,15 +36,14 @@ class Chave
 	 * @ManyToOne(targetEntity="Predio", fetch="LAZY")
      * @Column(type="integer", name="id_predio", nullable=false, options={"comment":"Identificador do prédio."})
 	 */
-	private $predio;   
-    /**
- 	 * @OneToMany(targetEntity="Emprestimo", mappedBy="emprestimos")
- 	 */
-	private $emprestimos;
+	private $predio;
+   
+ 	//@OneToMany(targetEntity="Emprestimo", mappedBy="emprestimos")
+ 	//private $emprestimos;
 
-    public function __construct() {
+    /*public function __construct() {
 		$this->emprestimos = new ArrayCollection();
-	}
+	}*/
 
     public function getId(): int
     {
@@ -99,14 +98,14 @@ class Chave
         return $this->flAtivo == 'S';
     }
 
-    public function addEmprestimo(Emprestimo $emprestimo):  void {
+    /*public function addEmprestimo(Emprestimo $emprestimo):  void {
 	    if (!$this->emprestimos->contains($emprestimo)) {
     		$this->emprestimos->add($emprestimo);
     		$emprestimo->setChave($this);
 		}
-	}
+	}*/
 
-	public function getEmprestimos(): Collection {
+	/*public function getEmprestimos(): Collection {
     	return $this->emprestimos;
-	}
+	}*/
 }

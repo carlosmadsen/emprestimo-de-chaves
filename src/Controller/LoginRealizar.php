@@ -32,7 +32,7 @@ class LoginRealizar implements RequestHandlerInterface
 			$senha = filter_var($request->getParsedBody()['senha'], FILTER_SANITIZE_STRING);
 		
 			if (is_null($login) || $login === false) {
-				throw new \Exception("Login ou senha inválido.", 1);		
+				throw new \Exception("Login ou senha inválido.", 1);
 			}
 
 			$usuario = $this->repositorioUsuarios->findOneBy(['login' => $login]);
@@ -40,7 +40,15 @@ class LoginRealizar implements RequestHandlerInterface
 				throw new \Exception("Login ou senha inválido.", 1);
 			}
 
-			$_SESSION['usuario'] = $usuario;
+			$_SESSION['usuario'] = [
+				'id' => $usuario->getId(),
+				'login' =>  $usuario->getLogin(),
+				'nome' =>  $usuario->getNome(),
+				'id_instituicao' =>  $usuario->getInstituicao()->getId(),
+				'adm' => $usuario->ehAdm()
+			];
+			$_SESSION['rodape'] = $usuario->getInstituicao()->getNome();
+
 			return new Response(302, ['Location' => '/emprestimos'], null);
 		}
 		catch (\Exception $e) {

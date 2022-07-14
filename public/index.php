@@ -24,6 +24,13 @@ $creator = new ServerRequestCreator(
 );
 $request = $creator->fromGlobals();
 
+if ($caminho === '/login') {
+    session_destroy();
+}
+if ((strpos($caminho, 'login') === false) and is_null($_SESSION['usuario'])) {
+    $caminho = '/login';
+}
+
 $classeControladora = $rotas[$caminho];
 $container = require __DIR__ . '/../config/dependencies.php';
 $controlador = $container->get($classeControladora);

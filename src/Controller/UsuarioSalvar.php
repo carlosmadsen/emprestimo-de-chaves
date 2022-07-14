@@ -5,7 +5,7 @@ namespace Emprestimo\Chaves\Controller;
 use Emprestimo\Chaves\Entity\Usuario;
 use Emprestimo\Chaves\Entity\Instituicao;
 use Emprestimo\Chaves\Infra\EntityManagerCreator;
-use Emprestimo\Chaves\Helper\RenderizadorDeHtmlTrait;
+use Emprestimo\Chaves\Helper\FlashMessageTrait;
 
 use Nyholm\Psr7\Response;
 use Psr\Http\Message\ServerRequestInterface;
@@ -13,9 +13,10 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Doctrine\ORM\EntityManagerInterface;
 
-class EmprestimosListar  implements RequestHandlerInterface
+class UsuarioSalvar  implements RequestHandlerInterface
 {
-    use RenderizadorDeHtmlTrait;
+	use FlashMessageTrait;
+
     private $repositorioUsuarios;
     private $entityManager;
 
@@ -27,16 +28,19 @@ class EmprestimosListar  implements RequestHandlerInterface
 
     public function handle(ServerRequestInterface $request): ResponseInterface 
     {
+		$rota = '/novo-usuario';
         $dadosUsuario = $_SESSION['usuario'];
-        $usuario = $this->repositorioUsuarios->findOneBy(['id' => $dadosUsuario['id']]);
-        if (is_null($usuario)) {
+		try {
+			throw new \Exception("Error Processing Request", 1);
+			
+		}
+		catch (\Exception $e) {
+            $_SESSION['dados'] = [
+                'login' => $login,
 
-        }
-     
-          
-        $html = $this->renderizaHtml('emprestimos/listar.php', [
-            'titulo' => 'Empréstimos'
-        ]); 
-        return new Response(200, [], $html);
+            ];
+			$this->defineMensagem('danger', $e->getMessage());
+		}
+		return new Response(302, ['Location' => $rota], null);
     }
 }

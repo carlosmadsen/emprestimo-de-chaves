@@ -3,11 +3,11 @@
     <form action="/realiza-login" method="post">
         <div class="form-group">
             <label for="login">Login:</label>
-            <input type="login" name="login" id="login" class="form-control">
+            <input type="login" name="login" id="login" class="form-control" required="required" >
         </div>
         <div class="form-group">
             <label for="senha">Senha:</label>
-            <input type="password" name="senha" id="senha" class="form-control">
+            <input type="password" name="senha" id="senha" class="form-control" required="required" >
         </div>
         <button class="btn btn-primary">
             Entrar

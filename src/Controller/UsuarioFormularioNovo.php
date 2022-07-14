@@ -6,6 +6,7 @@ use Emprestimo\Chaves\Entity\Usuario;
 use Emprestimo\Chaves\Entity\Instituicao;
 use Emprestimo\Chaves\Infra\EntityManagerCreator;
 use Emprestimo\Chaves\Helper\RenderizadorDeHtmlTrait;
+use Emprestimo\Chaves\Helper\FlashMessageTrait;
 
 use Nyholm\Psr7\Response;
 use Psr\Http\Message\ServerRequestInterface;
@@ -13,9 +14,11 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Doctrine\ORM\EntityManagerInterface;
 
-class EmprestimosListar  implements RequestHandlerInterface
+class UsuarioFormularioNovo implements RequestHandlerInterface
 {
     use RenderizadorDeHtmlTrait;
+	use FlashMessageTrait;
+
     private $repositorioUsuarios;
     private $entityManager;
 
@@ -28,15 +31,18 @@ class EmprestimosListar  implements RequestHandlerInterface
     public function handle(ServerRequestInterface $request): ResponseInterface 
     {
         $dadosUsuario = $_SESSION['usuario'];
-        $usuario = $this->repositorioUsuarios->findOneBy(['id' => $dadosUsuario['id']]);
-        if (is_null($usuario)) {
-
-        }
-     
-          
-        $html = $this->renderizaHtml('emprestimos/listar.php', [
-            'titulo' => 'Empréstimos'
-        ]); 
+        $dados = (array)$_SESSION['dados'];
+        var_dump($dados);
+        unset($_SESSION['dados']);
+		try { 
+			$html = $this->renderizaHtml('usuarios/formulario.php', [
+          	  'titulo' => 'Novo usuário'
+        	]);
         return new Response(200, [], $html);
+		}
+		catch (\Exception $e) {
+			$this->defineMensagem('danger', $e->getMessage());
+			return new Response(302, ['Location' => '/login'], null);
+		}
     }
 }
