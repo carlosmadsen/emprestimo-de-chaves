@@ -97,9 +97,9 @@ class Usuario
         return $this->login;
     }
 
-    public function setSenha(string $v): void
+    public function setSenha(string $v, $flCriptografar = true): void
     {
-        $this->senha = password_hash($v, PASSWORD_DEFAULT);
+        $this->senha = ($flCriptografar ? password_hash($v, PASSWORD_DEFAULT) : $v);
     }
 
     public function getSenha(): string
@@ -144,7 +144,7 @@ class Usuario
 
     public function getObservacao(): string
     {
-        return $this->observacao;
+        return !is_null($this->observacao) ? $this->observacao : '';
     }
 
     public function setEmail(string $v): void

@@ -8,8 +8,9 @@ use Emprestimo\Chaves\Controller\{
     InstituicaoFormulario,
     InstituicaoSalvar,
     UsuarioListar,
-    UsuarioFormularioNovo,
+    UsuarioFormulario,
     UsuarioSalvar,
+    UsuarioRemover
 };
 
 $rotas = [
@@ -21,8 +22,10 @@ $rotas = [
     '/instituicao' => InstituicaoFormulario::class,
     '/salvar-instituicao' => InstituicaoSalvar::class,
     '/usuarios' => UsuarioListar::class,
-    '/novo-usuario' => UsuarioFormularioNovo::class,
+    '/novo-usuario' => UsuarioFormulario::class,
+    '/alterar-usuario' => UsuarioFormulario::class,
     '/salvar-usuario' => UsuarioSalvar::class,
+    '/remover-usuario' => UsuarioRemover::class,
 ];
 
 return $rotas;

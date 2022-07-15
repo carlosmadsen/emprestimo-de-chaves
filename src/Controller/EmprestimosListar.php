@@ -6,6 +6,7 @@ use Emprestimo\Chaves\Entity\Usuario;
 use Emprestimo\Chaves\Entity\Instituicao;
 use Emprestimo\Chaves\Infra\EntityManagerCreator;
 use Emprestimo\Chaves\Helper\RenderizadorDeHtmlTrait;
+use Emprestimo\Chaves\Helper\SessionUserTrait;
 
 use Nyholm\Psr7\Response;
 use Psr\Http\Message\ServerRequestInterface;
@@ -16,6 +17,8 @@ use Doctrine\ORM\EntityManagerInterface;
 class EmprestimosListar  implements RequestHandlerInterface
 {
     use RenderizadorDeHtmlTrait;
+    use SessionUserTrait;
+
     private $repositorioUsuarios;
     private $entityManager;
 
@@ -27,7 +30,7 @@ class EmprestimosListar  implements RequestHandlerInterface
 
     public function handle(ServerRequestInterface $request): ResponseInterface 
     {
-        $dadosUsuario = $_SESSION['usuario'];
+        $dadosUsuario = $this->getSessionUser();
         $usuario = $this->repositorioUsuarios->findOneBy(['id' => $dadosUsuario['id']]);
         if (is_null($usuario)) {
 

@@ -7,6 +7,7 @@ use Emprestimo\Chaves\Entity\Instituicao;
 use Emprestimo\Chaves\Infra\EntityManagerCreator;
 use Emprestimo\Chaves\Helper\RenderizadorDeHtmlTrait;
 use Emprestimo\Chaves\Helper\FlashMessageTrait;
+use Emprestimo\Chaves\Helper\SessionUserTrait;
 
 use Nyholm\Psr7\Response;
 use Psr\Http\Message\ServerRequestInterface;
@@ -18,6 +19,7 @@ class InstituicaoFormulario  implements RequestHandlerInterface
 {
     use RenderizadorDeHtmlTrait;
 	use FlashMessageTrait;
+	use SessionUserTrait;
 
     private $repositorioUsuarios;
     private $entityManager;
@@ -30,8 +32,11 @@ class InstituicaoFormulario  implements RequestHandlerInterface
 
     public function handle(ServerRequestInterface $request): ResponseInterface 
     {
-        $dadosUsuario = $_SESSION['usuario'];
+        $dadosUsuario = $this->getSessionUser();
 		try { 
+			if (!$dadosUsuario['adm']) {
+                throw new \Exception("Somente usuários administradores podem acessar essa operação.", 1);
+            }
 			$usuario = $this->repositorioUsuarios->findOneBy(['id' => $dadosUsuario['id']]);
 			if (is_null($usuario)) {
 				throw new \Exception("Não foi possível identificar o usuário.", 1);
@@ -45,7 +50,7 @@ class InstituicaoFormulario  implements RequestHandlerInterface
 			return new Response(200, [], $html);
 		}
 		catch (\Exception $e) {
-			$this->defineMensagem('danger', $e->getMessage());
+			$this->defineFlashMessage('danger', $e->getMessage());
 			return new Response(302, ['Location' => '/login'], null);
 		}
     }

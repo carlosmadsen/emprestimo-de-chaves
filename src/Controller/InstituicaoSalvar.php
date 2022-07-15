@@ -6,6 +6,7 @@ use Emprestimo\Chaves\Entity\Usuario;
 use Emprestimo\Chaves\Entity\Instituicao;
 use Emprestimo\Chaves\Infra\EntityManagerCreator;
 use Emprestimo\Chaves\Helper\FlashMessageTrait;
+use Emprestimo\Chaves\Helper\SessionUserTrait;
 
 use Nyholm\Psr7\Response;
 use Psr\Http\Message\ServerRequestInterface;
@@ -16,7 +17,8 @@ use Doctrine\ORM\EntityManagerInterface;
 class InstituicaoSalvar  implements RequestHandlerInterface
 {
 	use FlashMessageTrait;
-
+	use SessionUserTrait;
+	
     private $repositorioUsuarios;
     private $entityManager;
 
@@ -28,9 +30,12 @@ class InstituicaoSalvar  implements RequestHandlerInterface
 
     public function handle(ServerRequestInterface $request): ResponseInterface 
     {
-        $dadosUsuario = $_SESSION['usuario'];
+        $dadosUsuario = $this->getSessionUser();
 		$dados = $request->getParsedBody();
 		try {
+			if (!$dadosUsuario['adm']) {
+                throw new \Exception("Somente usuários administradores podem acessar essa operação.", 1);
+            }
 			$sigla = array_key_exists('sigla', $dados) ? filter_var($dados['sigla'], FILTER_SANITIZE_STRING) : '';
 			if (empty($sigla)) {
 				throw new \Exception("Sigla não informada.", 1);
@@ -48,11 +53,11 @@ class InstituicaoSalvar  implements RequestHandlerInterface
 			$instituicao->setNome($nome);
  			$this->entityManager->merge($instituicao);
  			$this->entityManager->flush();
-			$this->defineMensagem('success', 'Informações da instituição atualizadas com sucesso.');
+			$this->defineFlashMessage('success', 'Informações da instituição atualizadas com sucesso.');
 			$_SESSION['rodape'] = $nome;
 		}
 		catch (\Exception $e) {
-			$this->defineMensagem('danger', $e->getMessage());
+			$this->defineFlashMessage('danger', $e->getMessage());
 		}
 		return new Response(302, ['Location' => '/instituicao'], null);
     }

@@ -6,6 +6,9 @@ use Emprestimo\Chaves\Entity\Usuario;
 use Emprestimo\Chaves\Infra\EntityManagerCreator;
 use Emprestimo\Chaves\Helper\RenderizadorDeHtmlTrait;
 use Emprestimo\Chaves\Helper\FlashMessageTrait;
+use Emprestimo\Chaves\Helper\FlashDataTrait;
+use Emprestimo\Chaves\Helper\SessionUserTrait;
+
 
 use Nyholm\Psr7\Response;
 use Psr\Http\Message\ServerRequestInterface;
@@ -17,6 +20,8 @@ class UsuarioListar implements RequestHandlerInterface
 {
     use RenderizadorDeHtmlTrait;
 	use FlashMessageTrait;
+	use FlashDataTrait;
+	use SessionUserTrait;
 
     private $repositorioDeUsuarios;
     private $entityManager;
@@ -29,7 +34,10 @@ class UsuarioListar implements RequestHandlerInterface
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-		$idInstituicao = (int)$_SESSION['usuario']['id_instituicao'];
+		$dadosUsuario = $this->getSessionUser();
+		$this->clearFlashData();
+		$ehAdm = (boolean)$dadosUsuario['adm'];
+		$idInstituicao = (int)$dadosUsuario['id_instituicao'];
 		$dados = (array)$request->getParsedBody();
 		$login = array_key_exists('login', $dados) ? filter_var($dados['login'], FILTER_SANITIZE_STRING) : '';
 		$nome = array_key_exists('nome', $dados) ? filter_var($dados['nome'], FILTER_SANITIZE_STRING) : '';
@@ -39,6 +47,9 @@ class UsuarioListar implements RequestHandlerInterface
 		try { 
 			if (empty($idInstituicao)) {
 				throw new \Exception("Não foi possível identificar a instituição do usuário atual.", 1);
+			}
+			if (!$ehAdm) {
+				throw new \Exception("Somente usuários administradores podem acessar essa operação.", 1);
 			}
 			$dql = 'SELECT 
 				usuario 
@@ -75,7 +86,7 @@ class UsuarioListar implements RequestHandlerInterface
 			return new Response(200, [], $html);
 		}
 		catch (\Exception $e) {
-			$this->defineMensagem('danger', $e->getMessage());
+			$this->defineFlashMessage('danger', $e->getMessage());
 			return new Response(302, ['Location' => '/login'], null);
 		}
     }

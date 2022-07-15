@@ -1,6 +1,6 @@
 <?php include __DIR__ . '/../inicio-html.php'; ?>
 
-    <form action="/salvar-usuario<?= isset($usuario) ? '?id='.$usuario->getId() : ''; ?>" method="post" >
+    <form action="/salvar-usuario<?= isset($id) ? '?id='.$id : ''; ?>" method="post" >
         
 		<div class="form-group">
             <label for="login">Login</label>
@@ -9,7 +9,7 @@
                 name="login" 
                 class="form-control"
 				required="required"
-                value="<?= isset($usuario) ? $usuario->getLogin(): ''; ?>"
+                value="<?= isset($login) ? $login : ''; ?>"
             >
         </div> 
 
@@ -19,7 +19,7 @@
                 id="senha" 
                 name="senha" 
                 class="form-control"
-				<?= (!isset($usuario) ?  'required="required"' : ''); ?>
+				<?= (!isset($id) ?  'required="required"' : ''); ?>
                 value=""
             >
         </div> 
@@ -31,7 +31,7 @@
                 name="nome" 
                 class="form-control"
 				required="required"
-                value="<?= isset($usuario) ? $usuario->getNome(): ''; ?>"
+                value="<?= isset($nome) ? $nome: ''; ?>"
             >
         </div> 
 
@@ -42,7 +42,7 @@
                 name="email" 
                 class="form-control"
 				required="required"
-                value="<?= isset($usuario) ? $usuario->getEmail(): ''; ?>"
+                value="<?= isset($email) ? $email : '' ; ?>"
             >
         </div> 
 
@@ -52,26 +52,26 @@
                 id="observacao" 
                 name="observacao" 
                 class="form-control"
-                value="<?= isset($usuario) ? $usuario->getObservaca(): ''; ?>"
+                value="<?= isset($observacao) ? $observacao : ''; ?>"
             >
         </div> 
 
 		<div class="form-group">
             <label for="administrador">Administrador</label>
-            <select class="form-control" id="administrador" name="administrador" >
+            <select class="form-control" id="administrador" name="administrador" required="required" >
 				<option></option>
-				<option <?= ((isset($usuario) and  $usuario->ehAdm()) ? 'selected': '') ; ?> value='S' >Sim</option>
-				<option <?= ((isset($usuario) and !$usuario->ehAdm()) ? 'selected': '') ; ?> value='N' >Não</option>
+				<option <?= ((isset($administrador) and $administrador=='S') ? 'selected': '') ; ?> value='S' >Sim</option>
+				<option <?= ((isset($administrador) and $administrador=='N') ? 'selected': '') ; ?> value='N' >Não</option>
 			</select>
         </div> 
 
-		<?php if (isset($usuario)) : ?>
+		<?php if (isset($id)) : ?>
 		<div class="form-group">
             <label for="ativo">Ativo</label>
-            <select class="form-control" id="ativo" name="ativo" >
+            <select class="form-control" id="ativo" name="ativo" required="required" >
 				<option></option>
-				<option <?= ((isset($usuario) and  $usuario->estaAtivo()) ? 'selected': '') ; ?> value='S' >Sim</option>
-				<option <?= ((isset($usuario) and !$usuario->estaAtivo()) ? 'selected': '') ; ?> value='N' >Não</option>
+				<option <?= ((isset($ativo) and $ativo=='S') ? 'selected': '') ; ?> value='S' >Sim</option>
+				<option <?= ((isset($ativo) and $ativo=='N') ? 'selected': '') ; ?> value='N' >Não</option>
 			</select>
         </div> 
 		<?php endif; ?>

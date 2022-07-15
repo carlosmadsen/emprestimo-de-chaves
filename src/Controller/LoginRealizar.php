@@ -5,6 +5,7 @@ namespace Emprestimo\Chaves\Controller;
 use Emprestimo\Chaves\Entity\Usuario;
 use Emprestimo\Chaves\Infra\EntityManagerCreator;
 use Emprestimo\Chaves\Helper\FlashMessageTrait;
+use Emprestimo\Chaves\Helper\SessionUserTrait;
 
 use Nyholm\Psr7\Response;
 use Psr\Http\Message\ServerRequestInterface;
@@ -14,7 +15,8 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class LoginRealizar implements RequestHandlerInterface
 {
-	 use FlashMessageTrait;
+	use FlashMessageTrait;
+	use SessionUserTrait;
 
     private $repositorioUsuarios;
 	private $entityManager;
@@ -39,20 +41,15 @@ class LoginRealizar implements RequestHandlerInterface
 			if (is_null($usuario) or !$usuario->senhaEstaCorreta($senha)) {
 				throw new \Exception("Login ou senha inválido.", 1);
 			}
+			if (!$usuario->estaAtivo()) {
+				throw new \Exception("Este usuário não está mais ativo.", 1);
+			}
 
-			$_SESSION['usuario'] = [
-				'id' => $usuario->getId(),
-				'login' =>  $usuario->getLogin(),
-				'nome' =>  $usuario->getNome(),
-				'id_instituicao' =>  $usuario->getInstituicao()->getId(),
-				'adm' => $usuario->ehAdm()
-			];
-			$_SESSION['rodape'] = $usuario->getInstituicao()->getNome();
-
+			$this->defineSessionUser($usuario);
 			return new Response(302, ['Location' => '/emprestimos'], null);
 		}
 		catch (\Exception $e) {
-       		$this->defineMensagem('danger', $e->getMessage());
+       		$this->defineFlashMessage('danger', $e->getMessage());
 			return new Response(302, ['Location' => '/login'], null);
      	}
 	} 
