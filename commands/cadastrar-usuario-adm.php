@@ -7,23 +7,23 @@ use Emprestimo\Chaves\Entity\Usuario;
 use Emprestimo\Chaves\Infra\EntityManagerCreator;
 
 try {
-	$login = $argv[1];
+	$login = array_key_exists(1, $argv) ? $argv[1] : null;
 	if (empty($login)) {
 		throw new Exception("No primeiro parâmetro deve ser informado o login do usuário.", 1);
 	}
-	$senha = $argv[2];
+	$senha = array_key_exists(2, $argv) ? $argv[2] : null;
 	if (empty($senha)) {
 		throw new Exception("No segundo parâmetro deve ser informado a senha do usuário.", 1);
 	}
-	$email = $argv[3];
+	$email = array_key_exists(3, $argv) ? $argv[3] : null;
 	if (empty($email)) {
 		throw new Exception("No terceiro parâmetro deve ser informado o e-mail do usuário.", 1);
 	}
-	$nome = $argv[4];
+	$nome = array_key_exists(4, $argv) ? $argv[4] : null;
 	if (empty($nome)) {
 		throw new Exception("No quarto parâmetro deve ser informado o nome do usuário.", 1);
 	}
-	$sigla = $argv[5];
+	$sigla = array_key_exists(5, $argv) ? $argv[5] : null;
 	if (empty($sigla)) {
 		throw new Exception("No quinto parâmetro deve ser informado a sigla da instituição.", 1);
 	}
@@ -37,6 +37,14 @@ try {
 	]);
 	if (is_null($instituicao)) {
 		throw new Exception('Não foi possível localizar a instituição pela sigla "'.$sigla.'".', 1);
+	}
+
+	$repositorioDeUsuarios = $entityManager->getRepository(Usuario::class);
+	$usuarioLogin = $repositorioDeUsuarios->findOneBy([
+		'login' => $login		
+	]); 
+	if (!is_null($usuarioLogin)) {
+		throw new Exception('Já existe um usuário com o login "'.$login.'".', 1);
 	}
 
 	$usuario = new Usuario();

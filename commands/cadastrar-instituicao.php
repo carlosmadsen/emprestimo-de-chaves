@@ -6,11 +6,11 @@ use Emprestimo\Chaves\Entity\Instituicao;
 use Emprestimo\Chaves\Infra\EntityManagerCreator;
 
 try {
-	$sigla = $argv[1];
+	$sigla = array_key_exists(1, $argv) ? $argv[1] : null;
 	if (empty($sigla)) {
 		throw new Exception("No primeiro parâmetro deve ser informado a sigla da instituição.", 1);
 	}
-	$nome = $argv[2];
+	$nome = array_key_exists(2, $argv) ? $argv[2] : null;
 	if (empty($nome)) {
 		throw new Exception("No segundo parâmetro deve ser informado o nome da instituição.", 1);
 	}
@@ -18,6 +18,17 @@ try {
 	$entityManagerCreator  = new EntityManagerCreator();
 	$entityManager = $entityManagerCreator->getEntityManager();
 		
+	$repositorioInstituicoes = $entityManager->getRepository(Instituicao::class);
+	$instituicaoSigla = $repositorioInstituicoes->findOneBy(['sigla' => $sigla]);
+	if (!is_null($instituicaoSigla)) {
+		throw new \Exception("Já existe uma instituição com a sigla ".$sigla.".", 1);
+	}
+
+	$instituicaoNome = $repositorioInstituicoes->findOneBy(['nome' => $nome]);
+	if (!is_null($instituicaoNome)) {
+		throw new \Exception("Já existe uma instituição com o nome ".$nome.".", 1);
+	}
+
 	$instituicao = new Instituicao();
 	$instituicao->setSigla($sigla);
 	$instituicao->setNome($nome);
