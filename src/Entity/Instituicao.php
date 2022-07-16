@@ -25,7 +25,7 @@ class Instituicao
      */
     private $sigla;
     /** 
-     * @Column(type="string", name="nome", length=255, nullable=false, options={"comment":"Nome da instituição."})
+     * @Column(type="string", name="nome", unique=true, length=255, nullable=false, options={"comment":"Nome da instituição."})
      */
 	private $nome;
     /**

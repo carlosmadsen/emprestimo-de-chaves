@@ -3,12 +3,14 @@
 namespace Emprestimo\Chaves\Controller;
 
 use Emprestimo\Chaves\Entity\Usuario;
+
 use Emprestimo\Chaves\Infra\EntityManagerCreator;
+
 use Emprestimo\Chaves\Helper\RenderizadorDeHtmlTrait;
 use Emprestimo\Chaves\Helper\FlashMessageTrait;
 use Emprestimo\Chaves\Helper\FlashDataTrait;
 use Emprestimo\Chaves\Helper\SessionUserTrait;
-
+use Emprestimo\Chaves\Helper\RequestTrait;
 
 use Nyholm\Psr7\Response;
 use Psr\Http\Message\ServerRequestInterface;
@@ -22,6 +24,7 @@ class UsuarioListar implements RequestHandlerInterface
 	use FlashMessageTrait;
 	use FlashDataTrait;
 	use SessionUserTrait;
+	use RequestTrait;
 
     private $repositorioDeUsuarios;
     private $entityManager;
@@ -38,18 +41,15 @@ class UsuarioListar implements RequestHandlerInterface
 		$this->clearFlashData();
 		$ehAdm = (boolean)$dadosUsuario['adm'];
 		$idInstituicao = (int)$dadosUsuario['id_instituicao'];
-		$dados = (array)$request->getParsedBody();
-		$login = array_key_exists('login', $dados) ? filter_var($dados['login'], FILTER_SANITIZE_STRING) : '';
-		$nome = array_key_exists('nome', $dados) ? filter_var($dados['nome'], FILTER_SANITIZE_STRING) : '';
-		$ativo = array_key_exists('ativo', $dados) ? filter_var($dados['ativo'], FILTER_SANITIZE_STRING) : '';
-		$administrador = array_key_exists('administrador', $dados) ? filter_var($dados['administrador'], FILTER_SANITIZE_STRING) : '';
+		$login = $this->getPOSTString('login', $request);
+		$nome = $this->getPOSTString('nome', $request);
+		$ativo = $this->getPOSTString('ativo', $request);
+		$administrador = $this->getPOSTString('administrador', $request);		
 		$temPesquisa = (!empty($login) or !empty($nome) or !empty($ativo) or !empty($administrador));
 		try { 
+			$this->userVerifyAdmin();		
 			if (empty($idInstituicao)) {
 				throw new \Exception("Não foi possível identificar a instituição do usuário atual.", 1);
-			}
-			if (!$ehAdm) {
-				throw new \Exception("Somente usuários administradores podem acessar essa operação.", 1);
 			}
 			$dql = 'SELECT 
 				usuario 

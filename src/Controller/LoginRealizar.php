@@ -3,9 +3,12 @@
 namespace Emprestimo\Chaves\Controller;
 
 use Emprestimo\Chaves\Entity\Usuario;
+
 use Emprestimo\Chaves\Infra\EntityManagerCreator;
+
 use Emprestimo\Chaves\Helper\FlashMessageTrait;
 use Emprestimo\Chaves\Helper\SessionUserTrait;
+use Emprestimo\Chaves\Helper\RequestTrait;
 
 use Nyholm\Psr7\Response;
 use Psr\Http\Message\ServerRequestInterface;
@@ -17,6 +20,7 @@ class LoginRealizar implements RequestHandlerInterface
 {
 	use FlashMessageTrait;
 	use SessionUserTrait;
+	use RequestTrait;
 
     private $repositorioUsuarios;
 	private $entityManager;
@@ -30,9 +34,9 @@ class LoginRealizar implements RequestHandlerInterface
 	public function handle(ServerRequestInterface $request): ResponseInterface
 	{
 		try {
-			$login = filter_var($request->getParsedBody()['login'], FILTER_SANITIZE_STRING);
-			$senha = filter_var($request->getParsedBody()['senha'], FILTER_SANITIZE_STRING);
-		
+			$login = $this->getPOSTString('login', $request);
+			$senha = $this->getPOSTString('senha', $request);
+					
 			if (is_null($login) || $login === false) {
 				throw new \Exception("Login ou senha inválido.", 1);
 			}

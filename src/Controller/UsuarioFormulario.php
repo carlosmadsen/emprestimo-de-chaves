@@ -4,11 +4,14 @@ namespace Emprestimo\Chaves\Controller;
 
 use Emprestimo\Chaves\Entity\Usuario;
 use Emprestimo\Chaves\Entity\Instituicao;
+
 use Emprestimo\Chaves\Infra\EntityManagerCreator;
+
 use Emprestimo\Chaves\Helper\RenderizadorDeHtmlTrait;
 use Emprestimo\Chaves\Helper\FlashMessageTrait;
 use Emprestimo\Chaves\Helper\FlashDataTrait;
 use Emprestimo\Chaves\Helper\SessionUserTrait;
+use Emprestimo\Chaves\Helper\RequestTrait;
 
 use Nyholm\Psr7\Response;
 use Psr\Http\Message\ServerRequestInterface;
@@ -22,6 +25,7 @@ class UsuarioFormulario implements RequestHandlerInterface
 	use FlashMessageTrait;
     use FlashDataTrait;
     use SessionUserTrait;
+    use RequestTrait;
 
     private $repositorioUsuarios;
     private $entityManager;
@@ -35,14 +39,12 @@ class UsuarioFormulario implements RequestHandlerInterface
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $dadosUsuario = $this->getSessionUser();
-        $id = array_key_exists('id', $request->getQueryParams()) ? filter_var($request->getQueryParams()['id'], FILTER_VALIDATE_INT) : null;
+        $id = $this->getGETInteger('id', $request);
         $titulo = ( empty($id) ? 'Novo usuário' : 'Alterar usuário');
         $dados = $this->getFlashData();
         $this->clearFlashData();
         try {
-            if (!$dadosUsuario['adm']) {
-                throw new \Exception("Somente usuários administradores podem acessar essa operação.", 1);
-            }
+            $this->userVerifyAdmin();
             if (empty($dados) and !empty($id)) {
                 $usuario = $this->repositorioUsuarios->findOneBy(['id' => $id]);
                 if (is_null($usuario)) {

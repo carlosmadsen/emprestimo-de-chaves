@@ -47,9 +47,7 @@ class UsuarioRemover implements RequestHandlerInterface
     {
 		try {
 			$dadosUsuario = $this->getSessionUser();
-			if (!$dadosUsuario['adm']) {
-				throw new \Exception("Somente um usuário administrador pode remover outros usuários.", 1);
-			}
+			$this->userVerifyAdmin();
 			$id = filter_var($request->getQueryParams()['id'], FILTER_VALIDATE_INT);
 			if (is_null($id) || $id === false) {
 				throw new \Exception("Identificação de usuário inválida.", 1);
