@@ -39,9 +39,9 @@ php -S localhost:8080 -t public
 ## Exemplo de uso:
 Acesse no seu navegador o endereço http://localhost:8080/login e se identifique com o login e senha definidos no comando "cadastrar-usuario-adm.php". 
 ## Dica:
-Se estiver rodando no windows e o correr um erro na aplição, pare o servidor web e rode o seguinte comando na pasta do projeto: 
+Se estiver rodando no windows e ocorrer um erro na aplicação, pare o servidor web e rode o seguinte comando na pasta do projeto: 
 ```
-vendor\bin\doctrine orm:generate-proxies
+.\vendor\bin\doctrine orm:generate-proxies
 ```
 Em seguida reinicie o servidor web: 
 ```

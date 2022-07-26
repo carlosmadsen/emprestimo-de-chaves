@@ -31,6 +31,14 @@ if ((strpos($caminho, 'login') === false) and is_null($_SESSION['usuario'])) {
     $caminho = '/login';
 }
 
+$_SESSION['js'] = null;
+if (!empty($caminho)) {
+    $arqJs = '/js'.$caminho.'.js';
+    if (file_exists(__DIR__ .$arqJs)) {
+        $_SESSION['js'] = $arqJs;
+    }
+}
+
 $classeControladora = $rotas[$caminho];
 $container = require __DIR__ . '/../config/dependencies.php';
 $controlador = $container->get($classeControladora);

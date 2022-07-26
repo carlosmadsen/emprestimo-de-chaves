@@ -39,7 +39,7 @@ class UsuarioFormulario implements RequestHandlerInterface
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $dadosUsuario = $this->getSessionUser();
-        $id = $this->getGETInteger('id', $request);
+        $id = $this->requestGETInteger('id', $request);
         $titulo = ( empty($id) ? 'Novo usuário' : 'Alterar usuário');
         $dados = $this->getFlashData();
         $this->clearFlashData();

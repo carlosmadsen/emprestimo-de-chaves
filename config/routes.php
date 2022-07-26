@@ -10,11 +10,13 @@ use Emprestimo\Chaves\Controller\{
     UsuarioListar,
     UsuarioFormulario,
     UsuarioSalvar,
-    UsuarioRemover
+    UsuarioRemover,
+    MinhaContaFormulario,
+    MinhaContaSalvar
 };
 
 $rotas = [
-    '/' => EmprestimosListar::class,
+    '' => EmprestimosListar::class,
     '/emprestimos' => EmprestimosListar::class,
     '/logout' => Deslogar::class,
     '/login' => LoginFormulario::class,
@@ -26,6 +28,8 @@ $rotas = [
     '/alterar-usuario' => UsuarioFormulario::class,
     '/salvar-usuario' => UsuarioSalvar::class,
     '/remover-usuario' => UsuarioRemover::class,
+    '/minha-conta' => MinhaContaFormulario::class,
+    '/salvar-minha-conta' => MinhaContaSalvar::class
 ];
 
 return $rotas;

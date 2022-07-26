@@ -34,8 +34,8 @@ class LoginRealizar implements RequestHandlerInterface
 	public function handle(ServerRequestInterface $request): ResponseInterface
 	{
 		try {
-			$login = $this->getPOSTString('login', $request);
-			$senha = $this->getPOSTString('senha', $request);
+			$login = $this->requestPOSTString('login', $request);
+			$senha = $this->requestPOSTString('senha', $request);
 					
 			if (is_null($login) || $login === false) {
 				throw new \Exception("Login ou senha inválido.", 1);

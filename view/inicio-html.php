@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <title>Empréstimo de Chaves</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <?php if (!empty($_SESSION['js'])): ?>
+    <script src="/js/jquery-3.6.0.min.js"></script>
+    <script src="<?= $_SESSION['js']; ?>"></script>
+    <?php endif; ?>
+
 </head>
 <body>
 
@@ -26,6 +32,9 @@
         </li>
         <li class="nav-item">
           <a class="nav-link" href="/emprestimos">Empréstimos</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/minha-conta">Minha Conta</a>
         </li>
       </ul>   
          

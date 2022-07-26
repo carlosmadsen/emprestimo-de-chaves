@@ -41,10 +41,10 @@ class UsuarioListar implements RequestHandlerInterface
 		$this->clearFlashData();
 		$ehAdm = (boolean)$dadosUsuario['adm'];
 		$idInstituicao = (int)$dadosUsuario['id_instituicao'];
-		$login = $this->getPOSTString('login', $request);
-		$nome = $this->getPOSTString('nome', $request);
-		$ativo = $this->getPOSTString('ativo', $request);
-		$administrador = $this->getPOSTString('administrador', $request);		
+		$login = $this->requestPOSTString('login', $request);
+		$nome = $this->requestPOSTString('nome', $request);
+		$ativo = $this->requestPOSTString('ativo', $request);
+		$administrador = $this->requestPOSTString('administrador', $request);		
 		$temPesquisa = (!empty($login) or !empty($nome) or !empty($ativo) or !empty($administrador));
 		try { 
 			$this->userVerifyAdmin();		

@@ -12,6 +12,7 @@ trait SessionUserTrait
             'id' => $usuario->getId(),
             'login' =>  $usuario->getLogin(),
             'nome' =>  $usuario->getNome(),
+            'email' =>  $usuario->getEmail(),
             'id_instituicao' =>  $usuario->getInstituicao()->getId(),
             'adm' => $usuario->ehAdm()
         ];

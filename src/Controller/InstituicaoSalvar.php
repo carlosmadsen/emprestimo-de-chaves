@@ -67,11 +67,11 @@ class InstituicaoSalvar  implements RequestHandlerInterface
     {
 		try {
 			$this->userVerifyAdmin();
-			$sigla = $this->getPOSTString('sigla', $request);
+			$sigla = $this->requestPOSTString('sigla', $request);
 			if (empty($sigla)) {
 				throw new \Exception("Sigla não informada.", 1);
 			}
-			$nome = $this->getPOSTString('nome', $request);
+			$nome = $this->requestPOSTString('nome', $request);
 			if (empty($nome)) {
 				throw new \Exception("Nome não informado.", 1);
 			}
