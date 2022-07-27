@@ -52,6 +52,7 @@ require __DIR__ . '/../inicio-html.php'; ?>
 </div>
 </form>
 
+<?php if (count($usuarios) > 0) : ?>
 
  <table class="table  table-bordered">
   <thead >
@@ -64,7 +65,7 @@ require __DIR__ . '/../inicio-html.php'; ?>
     </tr>
   </thead>
   <tbody>
-     <?php foreach ($usuarios as $usuario): ?>
+    <?php foreach ($usuarios as $usuario): ?>
     <tr>
       <th><?= $usuario->getLogin(); ?></th>
       <td><?= $usuario->getNome(); ?></td>
@@ -83,5 +84,13 @@ require __DIR__ . '/../inicio-html.php'; ?>
   </tbody>
 </table>
   
+<?php else: ?>
+
+<div class="alert alert-info">
+  Não encontrado nenhum usuário.
+</div>
+
+<?php endif; ?>
+
 <?php
 require __DIR__ . '/../fim-html.php';

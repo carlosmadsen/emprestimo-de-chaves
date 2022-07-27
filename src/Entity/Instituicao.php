@@ -29,7 +29,7 @@ class Instituicao
      */
 	private $nome;
     /**
- 	 * @OneToMany(targetEntity="Predio", mappedBy="predios")
+ 	 * @OneToMany(targetEntity="Predio", mappedBy="instituicao")
  	 */
 	private $predios;
     /**

@@ -4,10 +4,13 @@ namespace Emprestimo\Chaves\Controller;
 
 use Emprestimo\Chaves\Entity\Usuario;
 use Emprestimo\Chaves\Entity\Instituicao;
+
 use Emprestimo\Chaves\Infra\EntityManagerCreator;
+
 use Emprestimo\Chaves\Helper\FlashMessageTrait;
 use Emprestimo\Chaves\Helper\FlashDataTrait;
 use Emprestimo\Chaves\Helper\SessionUserTrait;
+use Emprestimo\Chaves\Helper\RequestTrait;
 
 use Nyholm\Psr7\Response;
 use Psr\Http\Message\ServerRequestInterface;
@@ -20,6 +23,7 @@ class UsuarioSalvar  implements RequestHandlerInterface
 	use FlashMessageTrait;
     use FlashDataTrait;
     use SessionUserTrait;
+    use RequestTrait;
 
     private $repositorioUsuarios;
     private $entityManager;
@@ -30,13 +34,11 @@ class UsuarioSalvar  implements RequestHandlerInterface
         $this->repositorioUsuarios = $this->entityManager->getRepository(Usuario::class);
     }
 
-    private function verificaDuplicacaoLogin($login, $idInstituicao, $idUsuario = null) {
+    private function verificaDuplicacaoLogin($login, $idUsuario = null) {
         $dql = 'SELECT 
             usuario 
-        FROM '.Usuario::class.' usuario 
-        JOIN usuario.instituicao instituicao
+        FROM '.Usuario::class." usuario        
         WHERE 
-            instituicao.id = '.(int)$idInstituicao." AND 
             usuario.login = '".trim($login)."' ";
         if (!empty($idUsuario)) {
             $dql .= ' AND usuario.id != '.(int)$idUsuario;
@@ -81,21 +83,23 @@ class UsuarioSalvar  implements RequestHandlerInterface
 	}
 
     public function handle(ServerRequestInterface $request): ResponseInterface
-    {
-		$dadosUsuario = $this->getSessionUser();
-        $dados = $request->getParsedBody();
-        $id = array_key_exists('id', $request->getQueryParams()) ? filter_var($request->getQueryParams()['id'], FILTER_VALIDATE_INT) : null;
-        $login = array_key_exists('login', $dados) ? filter_var($dados['login'], FILTER_SANITIZE_STRING) : '';
-        $nome = array_key_exists('nome', $dados) ? filter_var($dados['nome'], FILTER_SANITIZE_STRING) : '';
-        $senha = array_key_exists('senha', $dados) ? filter_var($dados['senha'], FILTER_SANITIZE_STRING) : '';
-        $email = array_key_exists('email', $dados) ? filter_var($dados['email'], FILTER_SANITIZE_STRING) : '';
-        $observacao = array_key_exists('observacao', $dados) ? filter_var($dados['observacao'], FILTER_SANITIZE_STRING) : '';
-	    $administrador = array_key_exists('administrador', $dados) ? filter_var($dados['administrador'], FILTER_SANITIZE_STRING) : 'N';
-	    $ativo = array_key_exists('ativo', $dados) ? filter_var($dados['ativo'], FILTER_SANITIZE_STRING) : 'S';
-		try {
-            if (!$dadosUsuario['adm']) {
-                throw new \Exception("Somente usuários administradores podem acessar essa operação.", 1);
-            }
+    {		 
+        $id = $this->requestGETInteger('id', $request);
+		$login = $this->requestPOSTString('login', $request);
+        $nome = $this->requestPOSTString('nome', $request);
+        $senha = $this->requestPOSTString('senha', $request);
+        $email = $this->requestPOSTString('email', $request);
+        $observacao = $this->requestPOSTString('observacao', $request);
+        $administrador = $this->requestPOSTString('administrador', $request);
+        if (empty($administrador)) {
+            $administrador = 'N';
+        }
+        $ativo = $this->requestPOSTString('ativo', $request);
+        if (empty($ativo)) {
+            $ativo = 'S';
+        }            
+        try {
+            $this->userVerifyAdmin();
             if (empty($login)) {
                 throw new \Exception("Login não informado.", 1);
             }
@@ -105,12 +109,15 @@ class UsuarioSalvar  implements RequestHandlerInterface
 		    if (empty($email)) {
                 throw new \Exception("E-mail não informado.", 1);
             }
-			$usuarioAtual = $this->repositorioUsuarios->findOneBy(['id' => $dadosUsuario['id']]);
+            $usuarioAtual = $this->getLoggedUser($this->entityManager);	
 			if (is_null($usuarioAtual)) {
 				throw new \Exception("Não foi possível identificar o usuário.", 1);
 			}
             $instituicao = $usuarioAtual->getInstituicao();
-            $this->verificaDuplicacaoLogin($login, $instituicao->getId(), $id);
+
+            //falta verifica se a instituição do usuário atual é a mesma do usuário que está sendo alterado!!!
+
+            $this->verificaDuplicacaoLogin($login, $id);
             $usuario = new Usuario();
             $usuario->setInstituicao($instituicao);
             $usuario->setLogin($login);
@@ -119,6 +126,14 @@ class UsuarioSalvar  implements RequestHandlerInterface
 			$usuario->setObservacao($observacao);
 		    $usuario->setAdm($administrador == 'S');
 		    $usuario->setAtivo($ativo == 'S');
+            //prédios 
+            $usuario->cleanPredios();
+            foreach ($instituicao->getPredios() as $predio) {
+                $idPredioPOST = $this->requestPOSTInteger('predio_'.$predio->getId(), $request);
+                if (!empty($idPredioPOST)) {
+                    $usuario->addPredio($predio);
+                }
+            }
             if (!is_null($id) && $id !== false) { //atualizar 
                 if (empty($senha)) {
                     $usuarioOriginal = $this->repositorioUsuarios->findOneBy(['id' => $id]);

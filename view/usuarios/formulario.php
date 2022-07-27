@@ -76,6 +76,24 @@
         </div> 
 		<?php endif; ?>
 
+        <div class="form-group">
+            <label>Prédios</label>
+            <?php if (count($predios) > 0) : ?>
+                <?php foreach ($predios as $predio): ?>
+                    <?php if ($predio->estaAtivo()) : ?>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="<?= $predio->getId(); ?>" name="predio_<?= $predio->getId(); ?>" id="predio_<?= $predio->getId(); ?>" />
+                            <label class="form-check-label" for="predio_<?= $predio->getId(); ?>"><?= $predio->getNome(); ?></label>
+                        </div>
+                    <?php endif; ?>
+                <?php endforeach; ?>  
+            <?php else: ?>
+            <div class="alert alert-info">
+                No momento não há nenhum prédio cadastrado para esta instituição.
+            </div>
+            <?php endif; ?>
+        </div> 
+
         <button class="btn btn-primary">Salvar</button>
         <a href="/usuarios" class="btn btn-secondary">
             Voltar

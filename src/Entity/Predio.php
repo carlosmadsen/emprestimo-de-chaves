@@ -15,7 +15,7 @@ use Doctrine\Common\Collections\Collection;
  *      schema = "chaves", 
  *      options = {"comment":"Prédios que terão as chaves das salas emprestadas."},
  *      uniqueConstraints={
- *            @UniqueConstraint(name="predio_instituicao", columns={"nome", "id_instituicao"})
+ *            @UniqueConstraint(name="predio_instituicao", columns={"nome", "instituicao_id"})
  *      }
  * )
  */
@@ -35,23 +35,29 @@ class Predio
      * @Column(type="string", name="fl_ativo", columnDefinition="CHAR(1) NOT NULL", options={"comment":"FLag que define se o prédio ainda é usado."})
      */
     private $flAtivo;
-	/**
- 	 * @OneToMany(targetEntity="Chave", mappedBy="chaves")
- 	 */
-	private $chaves;
     /**
-     * @ManyToMany(targetEntity="Usuario", mappedBy="predios", cascade={"persist"})
-	 * @JoinTable(name="usuarios_predios", schema="chaves") 
+     * @ManyToOne(targetEntity="Instituicao", inversedBy="predios")
+     */     
+	private $instituicao;
+    /**
+     * @ManyToMany(targetEntity="Usuario", inversedBy="predios", cascade={"persist"})
      */
     private $usuarios;
-    /**
-	 * @ManyToOne(targetEntity="Instituicao", fetch="LAZY")
-     * @Column(type="integer", name="id_instituicao", nullable=false, options={"comment":"Identificador da instituição do prédio."})
-	 */
-	private $instituicao;
+
+
+
+	/*
+ 	 * @OneToMany(targetEntity="Chave", mappedBy="chaves")
+ 	 
+	private $chaves;
+    
+    
+    */
+    
+    
 
 	public function __construct() {
-		$this->chaves = new ArrayCollection();
+		//$this->chaves = new ArrayCollection();
 		$this->usuarios = new ArrayCollection();
 	}
 
@@ -75,14 +81,14 @@ class Predio
         return $this->nome;
     }
 
-	public function addChave(Chave $chave) {
+	/*public function addChave(Chave $chave) {
 		$chave->setPredio($this);
 		$this->chaves->add($chave);
 	}
 
 	public function getChaves(): Collection {
 		return $this->chaves;
-	}
+	}*/
 
 	public function setAtivo(bool $fl): void
     {
@@ -100,7 +106,7 @@ class Predio
     }
 
 	public function addUsuario(Usuario $usuario):  void {
-	    if (!$this->usuarios->contains($predio)) {
+	    if (!$this->usuarios->contains($usuario)) {
     		$this->usuarios->add($usuario);
     		$usuario->addPredio($this);
 		}

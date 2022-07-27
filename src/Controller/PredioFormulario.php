@@ -2,7 +2,7 @@
 
 namespace Emprestimo\Chaves\Controller;
 
-use Emprestimo\Chaves\Entity\Usuario;
+use Emprestimo\Chaves\Entity\Predio;
 use Emprestimo\Chaves\Entity\Instituicao;
 
 use Emprestimo\Chaves\Infra\EntityManagerCreator;
@@ -19,7 +19,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Doctrine\ORM\EntityManagerInterface;
 
-class UsuarioFormulario implements RequestHandlerInterface
+class PredioFormulario implements RequestHandlerInterface
 {
     use RenderizadorDeHtmlTrait;
 	use FlashMessageTrait;
@@ -27,45 +27,39 @@ class UsuarioFormulario implements RequestHandlerInterface
     use SessionUserTrait;
     use RequestTrait;
 
-    private $repositorioUsuarios;
+    private $repositorioPredios;
     private $entityManager;
 
     public function __construct(EntityManagerInterface $entityManager)
     {
         $this->entityManager = $entityManager;
-        $this->repositorioUsuarios = $this->entityManager->getRepository(Usuario::class);
+        $this->repositorioPredios = $this->entityManager->getRepository(Predio::class);
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $dadosUsuario = $this->getSessionUser();
         $id = $this->requestGETInteger('id', $request);
-        $titulo = ( empty($id) ? 'Novo usuário' : 'Alterar usuário');
+        $titulo = ( empty($id) ? 'Novo prédio' : 'Alterar prédio');
         $dados = $this->getFlashData();
         $this->clearFlashData();
         try {
             $this->userVerifyAdmin();
             if (empty($dados) and !empty($id)) {
-                $usuario = $this->repositorioUsuarios->findOneBy(['id' => $id]);
-                if (is_null($usuario)) {
-				    throw new \Exception("Não foi possível identificar o usuário.", 1);
+                $predio = $this->repositorioPredios->findOneBy(['id' => $id]);
+                if (is_null($predio)) {
+				    throw new \Exception("Não foi possível identificar o prédio.", 1);
 			    }
-                $instituicao = $usuario->getInstituicao();
-                if ($instituicao->getId() != $dadosUsuario['id_instituicao']) {
-                    throw new \Exception("O usuário selecionado não é da mesma instituição do usuário atual.", 1);
+                if ($predio->getInstituicao()->getId() != $dadosUsuario['id_instituicao']) {
+                    throw new \Exception("O prédio selecionado não é da mesma instituição do usuário atual.", 1);
                 }
                 $dados = [
-                    'id' => $id,
-                    'login' => $usuario->getLogin(),
-                    'nome' => $usuario->getNome(),
-                    'email' => $usuario->getEmail(),
-                    'observacao' => $usuario->getObservacao(),
-                    'administrador' => ($usuario->ehAdm() ? 'S' : 'N'),
-                    'ativo' => ($usuario->estaAtivo() ? 'S' : 'N'),
-                    'predios' => $instituicao->getPredios()
+                    'id' => $id,                    
+                    'nome' => $predio->getNome(),                    
+                    'ativo' => ($predio->estaAtivo() ? 'S' : 'N')
                 ];               
             }		
-			$html = $this->renderizaHtml('usuarios/formulario.php', array_merge([
+			$html = $this->renderizaHtml('predios/formulario.php', array_merge([
           	  'titulo' => $titulo
             ], $dados));
             return new Response(200, [], $html);

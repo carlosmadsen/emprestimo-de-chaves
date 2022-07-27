@@ -4,8 +4,10 @@ namespace Emprestimo\Chaves\Controller;
 
 use Emprestimo\Chaves\Entity\Usuario;
 use Emprestimo\Chaves\Entity\Instituicao;
+
 use Emprestimo\Chaves\Helper\FlashMessageTrait;
 use Emprestimo\Chaves\Helper\SessionUserTrait;
+use Emprestimo\Chaves\Helper\RequestTrait;
 
 use Nyholm\Psr7\Response;
 use Psr\Http\Message\ServerRequestInterface;
@@ -17,6 +19,7 @@ class UsuarioRemover implements RequestHandlerInterface
 {
 	use FlashMessageTrait;
 	use SessionUserTrait;
+	use RequestTrait;
 
 	private $repositorioUsuarios;
 	private $entityManager;
@@ -48,7 +51,7 @@ class UsuarioRemover implements RequestHandlerInterface
 		try {
 			$dadosUsuario = $this->getSessionUser();
 			$this->userVerifyAdmin();
-			$id = filter_var($request->getQueryParams()['id'], FILTER_VALIDATE_INT);
+			$id = $this->requestGETInteger('id', $request);
 			if (is_null($id) || $id === false) {
 				throw new \Exception("Identificação de usuário inválida.", 1);
 			}

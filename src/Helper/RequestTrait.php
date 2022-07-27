@@ -15,6 +15,12 @@ trait RequestTrait
 		return array_key_exists($chave, $dados) ? filter_var($dados[$chave], FILTER_SANITIZE_STRING) : '';
 	}
 
+	public function requestPOSTInteger(string $chave, ServerRequestInterface $request)
+	{
+		$dados = (array)$request->getParsedBody();
+		return array_key_exists($chave, $dados) ? filter_var($dados[$chave], FILTER_VALIDATE_INT) : null;
+	}
+
 	public function requestGETInteger(string $chave, ServerRequestInterface $request)
 	{
 		$dados = (array)$request->getQueryParams();

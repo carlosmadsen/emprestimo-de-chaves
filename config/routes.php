@@ -12,7 +12,11 @@ use Emprestimo\Chaves\Controller\{
     UsuarioSalvar,
     UsuarioRemover,
     MinhaContaFormulario,
-    MinhaContaSalvar
+    MinhaContaSalvar,
+    PredioListar,
+    PredioFormulario,
+    PredioSalvar,
+    PredioRemover,
 };
 
 $rotas = [
@@ -29,7 +33,12 @@ $rotas = [
     '/salvar-usuario' => UsuarioSalvar::class,
     '/remover-usuario' => UsuarioRemover::class,
     '/minha-conta' => MinhaContaFormulario::class,
-    '/salvar-minha-conta' => MinhaContaSalvar::class
+    '/salvar-minha-conta' => MinhaContaSalvar::class,
+    '/predios' => PredioListar::class,
+    '/novo-predio' => PredioFormulario::class,
+    '/alterar-predio' => PredioFormulario::class,
+    '/salvar-predio' => PredioSalvar::class,
+    '/remover-predio' => PredioRemover::class
 ];
 
 return $rotas;

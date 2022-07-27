@@ -41,11 +41,7 @@ class Usuario
     /** 
      * @Column(type="string", name="observacao", nullable=true, options={"comment":"Observações referentes a este usuário."})
      */
-    private $observacao;
-    /** 
-     * @Column(type="string", name="dt_validade", nullable=true, columnDefinition="DATE", options={"comment":"Data de validade deste usuário."})
-     */
-    private $validade;
+    private $observacao;    
     /** 
      * @Column(type="string", name="fl_ativo", columnDefinition="CHAR(1) NOT NULL", options={"comment":"FLag que define se o usuário ainda está ativo."})
      */
@@ -54,28 +50,20 @@ class Usuario
      * @Column(type="string", name="email", nullable=false, options={"comment":"E-mail do usuário."})
      */
     private $email;
-    
-    //  @ManyToMany(targetEntity="Predio", inversedBy="usuarios", cascade={"persist"})
-    // @JoinTable(name="usuarios_predios", schema="chaves")     * 
-     
-	//private $predios;
-    /**
- 	 * @OneToMany(targetEntity="Emprestimo", mappedBy="$emprestimosEmprestimo")
- 	 */
-	//private $emprestimosEmprestimo;
-    // @OneToMany(targetEntity="Emprestimo", mappedBy="$emprestimosDevolucao")
- 	//private $emprestimosDevolucao;
-    
     /**
      * @ManyToOne(targetEntity="Instituicao", inversedBy="usuarios")
      */  
 	private $instituicao;
+    /**
+     * @ManyToMany(targetEntity="Predio", mappedBy="usuarios", cascade={"persist"})
+     */
+    private $predios;   
 
-    /*public function __construct() {
+    public function __construct() {
 	    $this->predios = new ArrayCollection();
-    	$this->emprestimosEmprestimo = new ArrayCollection();
-		$this->emprestimosDevolucao = new ArrayCollection();
-	}*/
+    	//$this->emprestimosEmprestimo = new ArrayCollection();
+		//$this->emprestimosDevolucao = new ArrayCollection();
+	}
 
     public function getId(): int
     {
@@ -155,17 +143,7 @@ class Usuario
     public function getEmail(): string
     {
         return $this->email;
-    }
-
-    public function setValidade(string $v): void
-    {
-        $this->validade = $v;
-    }
-
-    public function getValidade(): string
-    {
-        return $this->validade;
-    }
+    }    
 
     public function setAtivo(bool $fl): void
     {
@@ -182,16 +160,20 @@ class Usuario
         return $this->flAtivo == 'S';
     }
 
-    /*public function addPredio(Predio $predio) {
+    public function cleanPredios() {
+        $this->predios = new ArrayCollection();
+    }
+
+    public function addPredio(Predio $predio) {
 		if (!$this->predios->contains($predio)) {
             $this->predios->add($predio);
 		    $predio->addUsuario($this);
         }
-   }*/
+    }
 
-	/*public function getPredios() {
+	public function getPredios() {
     	return $this->predios;
-	}*/
+	}
 
     /*public function addEmprestimoEmprestimo(Emprestimo $emprestimo):  void {
 	    if (!$this->emprestimosEmprestimo->contains($emprestimo)) {
