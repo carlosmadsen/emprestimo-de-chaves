@@ -51,10 +51,11 @@ class PredioListar implements RequestHandlerInterface
 			}
 			$dql = 'SELECT 
 				predio 
-			FROM '.Predio::class.' predio 
+			FROM '.Predio::class." predio 
 			JOIN predio.instituicao instituicao
+			LEFT JOIN predio.usuarios usuarios 
 			WHERE 
-				instituicao.id = '.$idInstituicao.' ';			
+				instituicao.id = ".$idInstituicao.' ';			
 			if (!empty($nome)) {
 				$dql .= " AND predio.nome like '%".trim(str_replace(' ', '%', $nome))."%' ";
 			}

@@ -37,26 +37,38 @@ class UsuarioListar implements RequestHandlerInterface
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-		$dadosUsuario = $this->getSessionUser();
-		$this->clearFlashData();
-		$ehAdm = (boolean)$dadosUsuario['adm'];
-		$idInstituicao = (int)$dadosUsuario['id_instituicao'];
-		$login = $this->requestPOSTString('login', $request);
-		$nome = $this->requestPOSTString('nome', $request);
-		$ativo = $this->requestPOSTString('ativo', $request);
-		$administrador = $this->requestPOSTString('administrador', $request);		
-		$temPesquisa = (!empty($login) or !empty($nome) or !empty($ativo) or !empty($administrador));
+		$this->clearFlashData();		
 		try { 
+			$usuarioAtual = $this->getLoggedUser($this->entityManager);
+			if (is_null($usuarioAtual)) {
+				throw new \Exception("Não foi possível identificar o usuário.", 1);
+			}
+			$instituicao = $usuarioAtual->getInstituicao();
+			$idInstituicao = $instituicao->getId();
+			$login = $this->requestPOSTString('login', $request);
+			$nome = $this->requestPOSTString('nome', $request);
+			$ativo = $this->requestPOSTString('ativo', $request);
+			$administrador = $this->requestPOSTString('administrador', $request);
+			$idPredio = $this->requestPOSTInteger('predio', $request);	
+			$temPesquisa = (!empty($login) or !empty($nome) or !empty($ativo) or !empty($administrador) or !empty($idPredio));
 			$this->userVerifyAdmin();		
 			if (empty($idInstituicao)) {
 				throw new \Exception("Não foi possível identificar a instituição do usuário atual.", 1);
 			}
+			$prediosAtivos = [];
+            $predios = $instituicao->getPredios();
+            foreach ($predios as $predio) {
+                if ($predio->estaAtivo()) {
+                    $prediosAtivos[] = $predio;
+                }
+            }
 			$dql = 'SELECT 
 				usuario 
-			FROM '.Usuario::class.' usuario 
+			FROM '.Usuario::class." usuario 
 			JOIN usuario.instituicao instituicao
+			LEFT JOIN usuario.predios predios 
 			WHERE 
-				instituicao.id = '.$idInstituicao.' ';
+				instituicao.id = ".$idInstituicao.' ';
 			if (!empty($login)) {
 				$dql .= " AND usuario.login = '".trim($login)."' ";
 			}
@@ -68,6 +80,9 @@ class UsuarioListar implements RequestHandlerInterface
 			}
 			if (!empty($administrador)) {
 				$dql .= " AND usuario.flAdm = '".trim($administrador)."' ";
+			}
+			if (!empty($idPredio)) {
+				$dql .= " AND predios.id = ".(int)$idPredio." ";
 			}
 			$dql .= '	
 			ORDER BY 
@@ -81,6 +96,8 @@ class UsuarioListar implements RequestHandlerInterface
 				'nome' => $nome,
 				'ativo' => $ativo,
 				'administrador' => $administrador,
+				'predios' => $prediosAtivos,
+				'idPredio' => $idPredio,
 				'temPesquisa' => $temPesquisa
 			]);
 			return new Response(200, [], $html);

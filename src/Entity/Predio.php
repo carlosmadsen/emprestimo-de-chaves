@@ -112,6 +112,13 @@ class Predio
 		}
 	}
 
+    public function removeUsuario(Usuario $usuario):  void {
+	    if ($this->usuarios->contains($usuario)) {
+    		$this->usuarios->removeElement($usuario);
+    		$usuario->removePredio($this);
+		}
+	}
+
 	public function getUsuarios(): Collection {
     	return $this->usuarios;
 	}

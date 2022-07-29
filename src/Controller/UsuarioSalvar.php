@@ -83,7 +83,7 @@ class UsuarioSalvar  implements RequestHandlerInterface
 	}
 
     public function handle(ServerRequestInterface $request): ResponseInterface
-    {		 
+    {	
         $id = $this->requestGETInteger('id', $request);
 		$login = $this->requestPOSTString('login', $request);
         $nome = $this->requestPOSTString('nome', $request);
@@ -91,6 +91,7 @@ class UsuarioSalvar  implements RequestHandlerInterface
         $email = $this->requestPOSTString('email', $request);
         $observacao = $this->requestPOSTString('observacao', $request);
         $administrador = $this->requestPOSTString('administrador', $request);
+        $prediosSelecionados = [];  
         if (empty($administrador)) {
             $administrador = 'N';
         }
@@ -113,13 +114,22 @@ class UsuarioSalvar  implements RequestHandlerInterface
 			if (is_null($usuarioAtual)) {
 				throw new \Exception("Não foi possível identificar o usuário.", 1);
 			}
-            $instituicao = $usuarioAtual->getInstituicao();
-
-            //falta verifica se a instituição do usuário atual é a mesma do usuário que está sendo alterado!!!
-
             $this->verificaDuplicacaoLogin($login, $id);
-            $usuario = new Usuario();
-            $usuario->setInstituicao($instituicao);
+            $instituicao = $usuarioAtual->getInstituicao();
+            $flAlterar = (!is_null($id) && $id !== false);
+            if ($flAlterar) {
+                $usuario = $this->repositorioUsuarios->findOneBy(['id' => $id]);
+                if (is_null($usuario)) {
+                    throw new \Exception("Não foi possível identificar o usuário.", 1);
+                }
+                if ($usuario->getInstituicao()->getId() != $instituicao->getId()) {
+                    throw new \Exception("O usuário selecionado não é da mesma instituição do usuário atual.", 1);
+                }
+            }
+            else {
+                $usuario = new Usuario();
+                $usuario->setInstituicao($instituicao);
+            }
             $usuario->setLogin($login);
             $usuario->setNome($nome);
 		    $usuario->setEmail($email);
@@ -127,14 +137,17 @@ class UsuarioSalvar  implements RequestHandlerInterface
 		    $usuario->setAdm($administrador == 'S');
 		    $usuario->setAtivo($ativo == 'S');
             //prédios 
-            $usuario->cleanPredios();
             foreach ($instituicao->getPredios() as $predio) {
                 $idPredioPOST = $this->requestPOSTInteger('predio_'.$predio->getId(), $request);
                 if (!empty($idPredioPOST)) {
+                    $prediosSelecionados[] = $idPredioPOST;
                     $usuario->addPredio($predio);
                 }
+                else {
+                    $usuario->removePredio($predio);
+                }
             }
-            if (!is_null($id) && $id !== false) { //atualizar 
+            if ($flAlterar) { //alterar
                 if (empty($senha)) {
                     $usuarioOriginal = $this->repositorioUsuarios->findOneBy(['id' => $id]);
                     $usuario->setSenha($usuarioOriginal->getSenha(), false);
@@ -148,10 +161,10 @@ class UsuarioSalvar  implements RequestHandlerInterface
                 if (!$usuario->estaAtivo()) {
                     $this->verificaUltimoAtivo($id, $instituicao->getId());
                 }
-                $usuario->setId($id);
+                
                 $this->entityManager->merge($usuario);
                 $this->defineFlashMessage('success', 'Usuário alterado com sucesso.');
-                if ($dadosUsuario['id'] == $id) {
+                if ($usuarioAtual->getId() == $id) {
                     $this->defineSessionUser($usuario);
                 }
             } else { //inserir 
@@ -174,7 +187,8 @@ class UsuarioSalvar  implements RequestHandlerInterface
                 'email' => $email,
                 'observacao' => $observacao,
                 'administrador' => $administrador,
-                'ativo' => $ativo
+                'ativo' => $ativo,
+                'predios_selecionados' => $prediosSelecionados
             ]);
             if (!empty($id)) {
                 $rota = '/alterar-usuario?id='.$id;
@@ -184,6 +198,6 @@ class UsuarioSalvar  implements RequestHandlerInterface
             }
 			$this->defineFlashMessage('danger', $e->getMessage());
 		}
-		return new Response(302, ['Location' => $rota], null);
+      	return new Response(302, ['Location' => $rota], null);
     }
 }

@@ -78,14 +78,12 @@
 
         <div class="form-group">
             <label>Prédios</label>
-            <?php if (count($predios) > 0) : ?>
-                <?php foreach ($predios as $predio): ?>
-                    <?php if ($predio->estaAtivo()) : ?>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="<?= $predio->getId(); ?>" name="predio_<?= $predio->getId(); ?>" id="predio_<?= $predio->getId(); ?>" />
-                            <label class="form-check-label" for="predio_<?= $predio->getId(); ?>"><?= $predio->getNome(); ?></label>
-                        </div>
-                    <?php endif; ?>
+            <?php if (!empty($predios) and (count($predios) > 0)) : ?>
+                <?php foreach ($predios as $predio): ?>                   
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="<?= $predio->getId(); ?>" name="predio_<?= $predio->getId(); ?>" id="predio_<?= $predio->getId(); ?>"  <?= (in_array($predio->getId(), $predios_selecionados) ? 'checked' : '') ?>  />
+                        <label class="form-check-label" for="predio_<?= $predio->getId(); ?>"><?= $predio->getNome(); ?></label>
+                    </div>                   
                 <?php endforeach; ?>  
             <?php else: ?>
             <div class="alert alert-info">

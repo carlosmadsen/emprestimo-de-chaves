@@ -37,6 +37,18 @@ require __DIR__ . '/../inicio-html.php'; ?>
     </select>
   </div>
 
+  <?php if (count($predios) > 0) : ?>
+    <div class="form-group col-md-2 ">
+      <label for="predio">Prédio</label>
+      <select class="form-control" id="predio" name="predio" >
+        <option></option>       
+        <?php foreach ($predios as $predio): ?>
+          <option value="<?= $predio->getId(); ?>" <?= ($predio->getId() == $idPredio ? 'selected' : ''); ?> ><?= $predio->getNome(); ?></option>
+        <?php endforeach; ?>        
+      </select>
+    </div>
+  <?php endif; ?>
+
    <div class="form-group col-md-2">
      <label></label>
         <div>
@@ -61,6 +73,7 @@ require __DIR__ . '/../inicio-html.php'; ?>
       <th scope="col">Nome</th>
       <th scope="col">Adiministrador</th>
       <th scope="col">Ativo</th>
+      <th scope="col">Nº Prédios</th>
       <th scope="col">Operações</th>
     </tr>
   </thead>
@@ -71,14 +84,15 @@ require __DIR__ . '/../inicio-html.php'; ?>
       <td><?= $usuario->getNome(); ?></td>
       <td style="text-align:center;" ><?= ($usuario->ehAdm() ? 'Sim' : 'Não'); ?></td>
       <td style="text-align:center;" ><?= ($usuario->estaAtivo() ? 'Sim' : 'Não'); ?></td>
-      <th style="text-align:center;" >   
+      <td><?= count($usuario->getPredios()); ?> </td>
+      <td style="text-align:center;" >   
             <a href="/alterar-usuario?id=<?= $usuario->getId(); ?>" class="btn btn-info btn-sm">
                 Alterar
             </a>
             <a href="/remover-usuario?id=<?= $usuario->getId(); ?>" class="btn btn-danger btn-sm">
                 Remover
             </a>        
-      </th>
+      </td>
     </tr>
     <?php endforeach; ?>    
   </tbody>
@@ -87,7 +101,7 @@ require __DIR__ . '/../inicio-html.php'; ?>
 <?php else: ?>
 
 <div class="alert alert-info">
-  Não encontrado nenhum usuário.
+  Não foi encontrado nenhum usuário.
 </div>
 
 <?php endif; ?>

@@ -1,5 +1,4 @@
 # emprestimo-de-chaves
-Oi
 Aplicação para gerenciar o empréstimo de chaves de salas de aula ou malex de bibliotecas.
 ## Requisitos:
 Ter instalado o composer e o PHP (versão 7.3 ou superior) com com extensão do pdo_sqlite habilitada.

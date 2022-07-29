@@ -159,11 +159,7 @@ class Usuario
     {
         return $this->flAtivo == 'S';
     }
-
-    public function cleanPredios() {
-        $this->predios = new ArrayCollection();
-    }
-
+   
     public function addPredio(Predio $predio) {
 		if (!$this->predios->contains($predio)) {
             $this->predios->add($predio);
@@ -174,6 +170,14 @@ class Usuario
 	public function getPredios() {
     	return $this->predios;
 	}
+
+    public function removePredio(Predio $predio) {
+		if ($this->predios->contains($predio)) {
+            $this->predios->removeElement($predio);
+		    $predio->removeUsuario($this);
+        }
+    }
+
 
     /*public function addEmprestimoEmprestimo(Emprestimo $emprestimo):  void {
 	    if (!$this->emprestimosEmprestimo->contains($emprestimo)) {

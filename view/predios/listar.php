@@ -47,6 +47,7 @@ require __DIR__ . '/../inicio-html.php'; ?>
     <tr>
       <th scope="col">Nome</th>
       <th scope="col">Ativo</th>
+      <th scope="col">Nº Usuários</th>
       <th scope="col">Operações</th>
     </tr>
   </thead>
@@ -55,15 +56,16 @@ require __DIR__ . '/../inicio-html.php'; ?>
     <?php foreach ($predios as $predio): ?>
     <tr>
       <td><?= $predio->getNome(); ?></td>
-      <td style="text-align:center;" ><?= ($predio->estaAtivo() ? 'Sim' : 'Não'); ?></td>      
-      <th style="text-align:center;" >   
+      <td style="text-align:center;" ><?= ($predio->estaAtivo() ? 'Sim' : 'Não'); ?></td> 
+      <td><?= count($predio->getUsuarios()); ?> </td>     
+      <td style="text-align:center;" >   
             <a href="/alterar-predio?id=<?= $predio->getId(); ?>" class="btn btn-info btn-sm">
                 Alterar
             </a>
             <a href="/remover-predio?id=<?= $predio->getId(); ?>" class="btn btn-danger btn-sm">
                 Remover
             </a>        
-      </th>
+      </td>
     </tr>
     <?php endforeach; ?>    
 
@@ -73,7 +75,7 @@ require __DIR__ . '/../inicio-html.php'; ?>
 <?php else: ?>
 
 <div class="alert alert-info">
-  Não encontrado nenhum prédio.
+  Não foi encontrado nenhum prédio.
 </div>
 
 <?php endif; ?>
