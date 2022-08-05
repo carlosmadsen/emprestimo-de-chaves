@@ -2,6 +2,7 @@
 
 namespace Emprestimo\Chaves\Controller;
 
+use Emprestimo\Chaves\Entity\Chave;
 use Emprestimo\Chaves\Entity\Predio;
 use Emprestimo\Chaves\Entity\Instituicao;
 
@@ -19,7 +20,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Doctrine\ORM\EntityManagerInterface;
 
-class PredioFormulario implements RequestHandlerInterface
+class ChaveFormulario implements RequestHandlerInterface
 {
     use RenderizadorDeHtmlTrait;
 	use FlashMessageTrait;
@@ -27,46 +28,67 @@ class PredioFormulario implements RequestHandlerInterface
     use SessionUserTrait;
     use RequestTrait;
 
-    private $repositorioPredios;
+    private $repositorioDeChaves;
     private $entityManager;
 
     public function __construct(EntityManagerInterface $entityManager)
     {
         $this->entityManager = $entityManager;
-        $this->repositorioPredios = $this->entityManager->getRepository(Predio::class);
+        $this->repositorioDeChaves = $this->entityManager->getRepository(Chave::class);        
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $dadosUsuario = $this->getSessionUser();
+        $idInstituicao = $dadosUsuario['id_instituicao'];
         $id = $this->requestGETInteger('id', $request);
-        $titulo = ( empty($id) ? 'Novo prédio' : 'Alterar prédio');
+        $titulo = ( empty($id) ? 'Nova chave' : 'Alterar chave');
         $dados = $this->getFlashData();
         $this->clearFlashData();
         try {
             $this->userVerifyAdmin();
-            if (empty($dados) and !empty($id)) {
-                $predio = $this->repositorioPredios->findOneBy(['id' => $id]);
-                if (is_null($predio)) {
-				    throw new \Exception("Não foi possível identificar o prédio.", 1);
+		    if (empty($dados) and !empty($id)) {
+                $chave = $this->repositorioDeChaves->findOneBy(['id' => $id]);
+                if (is_null($chave)) {
+				    throw new \Exception("Não foi possível identificar a chave.", 1);
 			    }
-                if ($predio->getInstituicao()->getId() != $dadosUsuario['id_instituicao']) {
+				$predio = $chave->getPredio();
+                if ($predio->getInstituicao()->getId() != $idInstituicao) {
                     throw new \Exception("O prédio selecionado não é da mesma instituição do usuário atual.", 1);
                 }
                 $dados = [
-                    'id' => $id,                    
-                    'nome' => $predio->getNome(),                    
-                    'ativo' => ($predio->estaAtivo() ? 'S' : 'N')
+                    'id' => $id,
+                    'idPredio' => $predio->getId(),
+					'numero' => $chave->getNumero(),
+                    'descricao' => $chave->getDescricao(),
+                    'ativo' => ($chave->estaAtivo() ? 'S' : 'N')
                 ];               
             }		
-			$html = $this->renderizaHtml('predios/formulario.php', array_merge([
+			$predios = $this->getPredios($idInstituicao);
+            $dados['predios'] = $predios;
+        	$html = $this->renderizaHtml('chaves/formulario.php', array_merge([
           	  'titulo' => $titulo
             ], $dados));
             return new Response(200, [], $html);
 		}
 		catch (\Exception $e) {
 			$this->defineFlashMessage('danger', $e->getMessage());
-			return new Response(302, ['Location' => '/predios'], null);
+			return new Response(302, ['Location' => '/chaves'], null);
 		}
     }
+
+    private function getPredios($idInstituicao) {
+		$dql = 'SELECT 
+			predio 
+		FROM ' . Predio::class . ' predio 
+		JOIN predio.instituicao instituicao
+		LEFT JOIN predio.usuarios usuarios 
+		WHERE 
+			instituicao.id = ' . $idInstituicao . ' 		
+		ORDER BY 
+			predio.nome ';
+		$query = $this->entityManager->createQuery($dql);
+		return  $query->getResult();
+	}
+
 }

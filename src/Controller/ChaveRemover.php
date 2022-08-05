@@ -16,32 +16,32 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Doctrine\ORM\EntityManagerInterface;
 
-class PredioRemover implements RequestHandlerInterface
+class ChaveRemover implements RequestHandlerInterface
 {
 	use FlashMessageTrait;
 	use SessionUserTrait;
 	use RequestTrait;
 
-	private $repositorioPredios;
+	private $repositorioDeChaves;
 	private $entityManager;
 
 	public function __construct(EntityManagerInterface $entityManager)
     {
         $this->entityManager = $entityManager;
-		$this->repositorioPredios = $this->entityManager->getRepository(Predio::class);
+		$this->repositorioDeChaves = $this->entityManager->getRepository(Chave::class);
     }
 
-	private function verificaTemChaves($idPredio) {
+	private function verificaTemEmprestimos($idChave) {
 		$dql = 'SELECT 
-            COUNT(chave) 
-        FROM '.Chave::class.' chave 
-        JOIN chave.predio predio
+            COUNT(emprestimo) 
+        FROM '.Emprestimo::class.' emprestimo 
+        JOIN emprestimo.chave chave
         WHERE 
-            predio.id = '.(int)$idPredio;
+            chave.id = '.(int)$idChave;
         $query = $this->entityManager->createQuery($dql);
-		$nrChaves = $query->getSingleScalarResult();  
-        if ($nrChaves > 0) {
-            throw new \Exception('Não é permitido remover o prédio, pois ele está relacionado a '.$nrChaves.' chaves.', 1);
+		$nrEmprestimos = $query->getSingleScalarResult();  
+        if ($nrEmprestimos > 0) {
+            throw new \Exception('Não é permitido remover a chave, pois ela está relacionada a '.$nrEmprestimos.' empréstimos.', 1);
         }
 	}
 
@@ -52,23 +52,22 @@ class PredioRemover implements RequestHandlerInterface
 			$this->userVerifyAdmin();
 			$id = $this->requestGETInteger('id', $request);
 			if (is_null($id) || $id === false) {
-				throw new \Exception("Identificação de prédio inválida.", 1);
+				throw new \Exception("Identificação de chave inválida.", 1);
 			}
 			if (empty($dadosUsuario['id_instituicao'])) {
 				throw new \Exception("Não foi possível identificar a instituição do usuário atual.", 1);
-			}
-			$this->verificaTemChaves($id);			
-			$predio = $this->repositorioPredios->findOneBy(['id' => $id]);
- 			if ($predio->getInstituicao()->getId() != $dadosUsuario['id_instituicao']) {
-				throw new \Exception("O prédio selecionado não é da mesma instituição do usuário atual.", 1);
+			}			
+			$chave = $this->repositorioDeChaves->findOneBy(['id' => $id]);
+ 			if ($chave->getPredio()->getInstituicao()->getId() != $dadosUsuario['id_instituicao']) {
+				throw new \Exception("A chave selecionada é de um prédio que não é da mesma instituição do usuário atual.", 1);
             }
-			$this->entityManager->remove($predio);
+			$this->entityManager->remove($chave);
 			$this->entityManager->flush();
-			$this->defineFlashMessage('success', 'Prédio removido com sucesso.');
+			$this->defineFlashMessage('success', 'Chave removida com sucesso.');
 		}
 		catch (\Exception $e) {
 			$this->defineFlashMessage('danger', $e->getMessage());
 		}
-		return new Response(302, ['Location' => '/predios'], null);
+		return new Response(302, ['Location' => '/chaves'], null);
     }
 }

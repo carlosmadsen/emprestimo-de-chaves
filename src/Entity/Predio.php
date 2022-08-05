@@ -43,21 +43,14 @@ class Predio
      * @ManyToMany(targetEntity="Usuario", inversedBy="predios", cascade={"persist"})
      */
     private $usuarios;
-
-
-
-	/*
- 	 * @OneToMany(targetEntity="Chave", mappedBy="chaves")
- 	 
+    /**
+ 	 * @OneToMany(targetEntity="Chave", mappedBy="predio")
+ 	 */
 	private $chaves;
-    
-    
-    */
-    
     
 
 	public function __construct() {
-		//$this->chaves = new ArrayCollection();
+		$this->chaves = new ArrayCollection();
 		$this->usuarios = new ArrayCollection();
 	}
 
@@ -81,14 +74,16 @@ class Predio
         return $this->nome;
     }
 
-	/*public function addChave(Chave $chave) {
-		$chave->setPredio($this);
-		$this->chaves->add($chave);
+	public function addChave(Chave $chave) {
+        if (!$this->chaves->contains($chave)) {
+            $chave->setPredio($this);
+            $this->chaves->add($chave);
+        }
 	}
 
 	public function getChaves(): Collection {
 		return $this->chaves;
-	}*/
+	}
 
 	public function setAtivo(bool $fl): void
     {

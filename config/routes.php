@@ -17,6 +17,10 @@ use Emprestimo\Chaves\Controller\{
     PredioFormulario,
     PredioSalvar,
     PredioRemover,
+    ChaveListar,
+    ChaveFormulario,
+    ChaveSalvar,
+    ChaveRemover
 };
 
 $rotas = [
@@ -38,7 +42,12 @@ $rotas = [
     '/novo-predio' => PredioFormulario::class,
     '/alterar-predio' => PredioFormulario::class,
     '/salvar-predio' => PredioSalvar::class,
-    '/remover-predio' => PredioRemover::class
+    '/remover-predio' => PredioRemover::class,
+    '/chaves' => ChaveListar::class,
+    '/nova-chave' => ChaveFormulario::class,
+    '/alterar-chave' => ChaveFormulario::class,
+    '/salvar-chave' => ChaveSalvar::class,
+    '/remover-chave' => ChaveRemover::class,
 ];
 
 return $rotas;

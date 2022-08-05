@@ -32,18 +32,11 @@ class Chave
      * @Column(type="string", name="fl_ativo", columnDefinition="CHAR(1) NOT NULL", options={"comment":"FLag que define se a chave ainda é usada."})
      */
     private $flAtivo;
-	/**
-	 * @ManyToOne(targetEntity="Predio", fetch="LAZY")
-     * @Column(type="integer", name="id_predio", nullable=false, options={"comment":"Identificador do prédio."})
-	 */
+    /**
+     * @ManyToOne(targetEntity="Predio", inversedBy="chaves")
+     */
 	private $predio;
-   
- 	//@OneToMany(targetEntity="Emprestimo", mappedBy="emprestimos")
- 	//private $emprestimos;
-
-    /*public function __construct() {
-		$this->emprestimos = new ArrayCollection();
-	}*/
+ 	
 
     public function getId(): int
     {
@@ -96,16 +89,5 @@ class Chave
     public function estaAtivo(): bool
     {
         return $this->flAtivo == 'S';
-    }
-
-    /*public function addEmprestimo(Emprestimo $emprestimo):  void {
-	    if (!$this->emprestimos->contains($emprestimo)) {
-    		$this->emprestimos->add($emprestimo);
-    		$emprestimo->setChave($this);
-		}
-	}*/
-
-	/*public function getEmprestimos(): Collection {
-    	return $this->emprestimos;
-	}*/
+    }  
 }
