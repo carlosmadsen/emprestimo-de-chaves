@@ -54,7 +54,7 @@ require __DIR__ . '/../inicio-html.php'; ?>
         <div>
             <button type="submit" class="btn btn-primary mb-2">Pesquisar</button>
             <?php if ($temPesquisa) : ?>
-              <a href="/usuarios" class="btn btn-secondary mb-2" >
+              <a href="/usuarios?limparFiltro=1" class="btn btn-secondary mb-2" >
               Limpar
               </a>
             <?php endif; ?>

@@ -10,6 +10,8 @@ use Emprestimo\Chaves\Helper\FlashMessageTrait;
 use Emprestimo\Chaves\Helper\FlashDataTrait;
 use Emprestimo\Chaves\Helper\SessionUserTrait;
 use Emprestimo\Chaves\Helper\RequestTrait;
+use Emprestimo\Chaves\Helper\SessionFilterTrait;
+
 use Nyholm\Psr7\Response;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -22,7 +24,8 @@ class ChaveListar implements RequestHandlerInterface {
 	use FlashDataTrait;
 	use SessionUserTrait;
 	use RequestTrait;
-	
+	use SessionFilterTrait;
+
 	private $entityManager;
 
 	public function __construct(EntityManagerInterface $entityManager) {
@@ -32,12 +35,25 @@ class ChaveListar implements RequestHandlerInterface {
 	public function handle(ServerRequestInterface $request): ResponseInterface {
 		$dadosUsuario = $this->getSessionUser();
 		$this->clearFlashData();
+		$this->defineSessionFilterKey('chaves');	
+		$cleanFilterSession = $this->requestGETInteger('limparFiltro', $request) == 1;
+		if ($cleanFilterSession) {
+			$this->clearFilterSession();
+		}
 		$idInstituicao = (int) $dadosUsuario['id_instituicao'];
-		$idPredio = $this->requestPOSTInteger('predio', $request);
-		$numero = $this->requestPOSTString('numero', $request);
-		$descricao = $this->requestPOSTString('descricao', $request);
-		$ativo = $this->requestPOSTString('ativo', $request);
+		$idPredio = $this->requestPOSTInteger('predio', $request) ? : $this->getFilterSession('predio');
+		$numero = $this->requestPOSTString('numero', $request) ? : $this->getFilterSession('numero');
+		$descricao = $this->requestPOSTString('descricao', $request) ? : $this->getFilterSession('descricao');
+		$ativo = $this->requestPOSTString('ativo', $request) ? : $this->getFilterSession('ativo');
 		$temPesquisa = (!empty($idPredio) or !empty($numero) or !empty($ativo));
+		if ($temPesquisa) {
+			$this->defineFilterSesssion([
+				'numero' => $numero,
+				'descricao' => $descricao,
+				'ativo' => $ativo,
+				'predio' => $idPredio
+			]);
+		}
 		try {
 			$this->userVerifyAdmin();
 			if (empty($idInstituicao)) {

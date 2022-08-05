@@ -11,6 +11,7 @@ use Emprestimo\Chaves\Helper\FlashMessageTrait;
 use Emprestimo\Chaves\Helper\FlashDataTrait;
 use Emprestimo\Chaves\Helper\SessionUserTrait;
 use Emprestimo\Chaves\Helper\RequestTrait;
+use Emprestimo\Chaves\Helper\SessionFilterTrait;
 
 use Nyholm\Psr7\Response;
 use Psr\Http\Message\ServerRequestInterface;
@@ -25,6 +26,7 @@ class UsuarioListar implements RequestHandlerInterface
 	use FlashDataTrait;
 	use SessionUserTrait;
 	use RequestTrait;
+	use SessionFilterTrait;
 
     private $repositorioDeUsuarios;
     private $entityManager;
@@ -37,7 +39,12 @@ class UsuarioListar implements RequestHandlerInterface
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-		$this->clearFlashData();		
+		$this->clearFlashData();
+		$this->defineSessionFilterKey('usuarios');	
+		$cleanFilterSession = $this->requestGETInteger('limparFiltro', $request) == 1;
+		if ($cleanFilterSession) {
+			$this->clearFilterSession();
+		}
 		try { 
 			$usuarioAtual = $this->getLoggedUser($this->entityManager);
 			if (is_null($usuarioAtual)) {
@@ -45,15 +52,24 @@ class UsuarioListar implements RequestHandlerInterface
 			}
 			$instituicao = $usuarioAtual->getInstituicao();
 			$idInstituicao = $instituicao->getId();
-			$login = $this->requestPOSTString('login', $request);
-			$nome = $this->requestPOSTString('nome', $request);
-			$ativo = $this->requestPOSTString('ativo', $request);
-			$administrador = $this->requestPOSTString('administrador', $request);
-			$idPredio = $this->requestPOSTInteger('predio', $request);	
+			$login = $this->requestPOSTString('login', $request) ? : $this->getFilterSession('login');
+			$nome = $this->requestPOSTString('nome', $request) ? : $this->getFilterSession('nome');
+			$ativo = $this->requestPOSTString('ativo', $request) ? : $this->getFilterSession('ativo');
+			$administrador = $this->requestPOSTString('administrador', $request) ? : $this->getFilterSession('administrador');
+			$idPredio = $this->requestPOSTInteger('predio', $request) ? : $this->getFilterSession('predio');	
 			$temPesquisa = (!empty($login) or !empty($nome) or !empty($ativo) or !empty($administrador) or !empty($idPredio));
 			$this->userVerifyAdmin();		
 			if (empty($idInstituicao)) {
 				throw new \Exception("Não foi possível identificar a instituição do usuário atual.", 1);
+			}
+			if ($temPesquisa) {
+				$this->defineFilterSesssion([
+					'login' => $login,
+					'nome' => $nome,
+					'ativo' => $ativo,
+					'administrador' => $administrador,
+					'predio' => $idPredio
+				]);
 			}
 			$prediosAtivos = [];
             $predios = $instituicao->getPredios();
