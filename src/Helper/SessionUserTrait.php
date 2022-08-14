@@ -8,15 +8,40 @@ trait SessionUserTrait
 {
 	public function defineSessionUser(Usuario $usuario): void
     {
+        $instituicao = $usuario->getInstituicao();
         $_SESSION['usuario'] = [
             'id' => $usuario->getId(),
             'login' =>  $usuario->getLogin(),
             'nome' =>  $usuario->getNome(),
             'email' =>  $usuario->getEmail(),
-            'id_instituicao' =>  $usuario->getInstituicao()->getId(),
-            'adm' => $usuario->ehAdm()
-        ];
-        $_SESSION['rodape'] = $usuario->getInstituicao()->getNome();
+            'adm' => $usuario->ehAdm(),
+            'instituicao' => [
+                'id' => $instituicao->getId(),
+                'nome' =>  $instituicao->getNome(),
+                'label_documento_pessoa' => $instituicao->getLabelDocumentoPessoa(),
+                'label_identificacao_pessoa' => $instituicao->getLabelIdentificacaoPessoa()
+            ]
+        ];       
+    }
+
+    public function getSessionUserLabelIdentificacaoPessoa(): string
+    {
+        return array_key_exists('usuario', $_SESSION) ? $_SESSION['usuario']['instituicao']['label_identificacao_pessoa'] : '';
+    }
+
+    public function getSessionUserLabelDocumentoPessoa(): string
+    {
+        return array_key_exists('usuario', $_SESSION) ? $_SESSION['usuario']['instituicao']['label_documento_pessoa'] : '';
+    }
+
+    public function getSessionUserIdInstituicao(): int
+    {
+        return array_key_exists('usuario', $_SESSION) ? $_SESSION['usuario']['instituicao']['id'] : 0;
+    }
+
+    public function getSessionUserNomeInstituicao(): int
+    {
+        return array_key_exists('usuario', $_SESSION) ? $_SESSION['usuario']['instituicao']['nome'] : 0;
     }
 
     public function getSessionUser(): array

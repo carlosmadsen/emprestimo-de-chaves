@@ -39,6 +39,7 @@ class PredioFormulario implements RequestHandlerInterface
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $dadosUsuario = $this->getSessionUser();
+        $idInstituicao = $this->getSessionUserIdInstituicao();
         $id = $this->requestGETInteger('id', $request);
         $titulo = ( empty($id) ? 'Novo prédio' : 'Alterar prédio');
         $dados = $this->getFlashData();
@@ -50,7 +51,7 @@ class PredioFormulario implements RequestHandlerInterface
                 if (is_null($predio)) {
 				    throw new \Exception("Não foi possível identificar o prédio.", 1);
 			    }
-                if ($predio->getInstituicao()->getId() != $dadosUsuario['id_instituicao']) {
+                if ($predio->getInstituicao()->getId() != $idInstituicao) {
                     throw new \Exception("O prédio selecionado não é da mesma instituição do usuário atual.", 1);
                 }
                 $dados = [
@@ -59,7 +60,7 @@ class PredioFormulario implements RequestHandlerInterface
                     'ativo' => ($predio->estaAtivo() ? 'S' : 'N')
                 ];               
             }		
-			$html = $this->renderizaHtml('predios/formulario.php', array_merge([
+			$html = $this->renderizaHtml('predio/formulario.php', array_merge([
           	  'titulo' => $titulo
             ], $dados));
             return new Response(200, [], $html);

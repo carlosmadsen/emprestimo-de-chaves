@@ -40,7 +40,7 @@ class ChaveListar implements RequestHandlerInterface {
 		if ($cleanFilterSession) {
 			$this->clearFilterSession();
 		}
-		$idInstituicao = (int) $dadosUsuario['id_instituicao'];
+		$idInstituicao = $this->getSessionUserIdInstituicao();
 		$idPredio = $this->requestPOSTInteger('predio', $request) ? : $this->getFilterSession('predio');
 		$numero = $this->requestPOSTString('numero', $request) ? : $this->getFilterSession('numero');
 		$descricao = $this->requestPOSTString('descricao', $request) ? : $this->getFilterSession('descricao');
@@ -61,7 +61,7 @@ class ChaveListar implements RequestHandlerInterface {
 			}
 			$predios = $this->getPredios($idInstituicao);
 			$chaves = $this->getChaves($idInstituicao, $idPredio, $numero, $descricao, $ativo);
-			$html = $this->renderizaHtml('chaves/listar.php', [
+			$html = $this->renderizaHtml('chave/listar.php', [
 				'titulo' => 'Chaves',
 				'chaves' => $chaves,
 				'predios' => $predios,

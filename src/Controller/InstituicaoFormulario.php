@@ -40,6 +40,8 @@ class InstituicaoFormulario  implements RequestHandlerInterface
 				'titulo' => 'Instituição',
 				'sigla' => $instituicao->getSigla(),
 				'nome' => $instituicao->getNome(),
+				'identificacao' => $instituicao->getLabelIdentificacaoPessoa(),
+				'documento' => $instituicao->getLabelDocumentoPessoa(),
 			]); 
 			return new Response(200, [], $html);
 		}

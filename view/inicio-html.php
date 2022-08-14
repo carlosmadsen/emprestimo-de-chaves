@@ -24,6 +24,9 @@
         <li class="nav-item">
           <a class="nav-link" href="/usuarios">Usuários</a>
         </li>
+         <li class="nav-item">
+          <a class="nav-link" href="/pessoas">Pessoas</a>
+        </li>
         <li class="nav-item">
           <a class="nav-link" href="/predios">Prédios</a>
         </li>
@@ -32,6 +35,9 @@
         </li>
         <li class="nav-item">
           <a class="nav-link" href="/emprestimos">Empréstimos</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/historicos">Históricos</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="/minha-conta">Minha Conta</a>

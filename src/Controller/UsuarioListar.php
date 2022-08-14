@@ -105,7 +105,7 @@ class UsuarioListar implements RequestHandlerInterface
 				usuario.nome ';
 			$query = $this->entityManager->createQuery($dql);
 			$usuarios = $query->getResult();
-			$html = $this->renderizaHtml('usuarios/listar.php', [
+			$html = $this->renderizaHtml('usuario/listar.php', [
 				'usuarios' => $usuarios,
 				'titulo' => 'Usuários',
 				'login' => $login,

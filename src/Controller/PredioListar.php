@@ -39,7 +39,7 @@ class PredioListar implements RequestHandlerInterface {
 		if ($cleanFilterSession) {
 			$this->clearFilterSession();
 		}
-		$idInstituicao = (int) $dadosUsuario['id_instituicao'];
+		$idInstituicao = $this->getSessionUserIdInstituicao();
 		$nome = $this->requestPOSTString('nome', $request) ? : $this->getFilterSession('nome');;
 		$ativo = $this->requestPOSTString('ativo', $request) ? : $this->getFilterSession('ativo');;
 		$temPesquisa = (!empty($nome) or !empty($ativo));
@@ -72,7 +72,7 @@ class PredioListar implements RequestHandlerInterface {
 				predio.nome ';
 			$query = $this->entityManager->createQuery($dql);
 			$predios = $query->getResult();
-			$html = $this->renderizaHtml('predios/listar.php', [
+			$html = $this->renderizaHtml('predio/listar.php', [
 				'predios' => $predios,
 				'titulo' => 'Prédios',
 				'nome' => $nome,

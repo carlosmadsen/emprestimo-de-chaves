@@ -2,10 +2,6 @@
 
 namespace Emprestimo\Chaves\Entity;
 
-use Emprestimo\Chaves\Entity\Chave;
-use Emprestimo\Chaves\Entity\Pessoa;
-use Emprestimo\Chaves\Entity\Usuario;
-
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
@@ -22,33 +18,27 @@ class Emprestimo
      */
     private $id;
     /**
-	 * @ManyToOne(targetEntity="Pessoa",fetch="LAZY")
-     * @Column(type="integer", name="id_pessoa", nullable=false, options={"comment":"Identificador da pessoa."})
-	 */
-	private $pessoa;
-    /**
-	 * @ManyToOne(targetEntity="Chave",fetch="LAZY")
-     * @Column(type="integer", name="id_chave", nullable=false, options={"comment":"Identificador da chave."})
-	 */
-	private $chave;
-    /**
-	 * @ManyToOne(targetEntity="Usuario",fetch="LAZY")
-     * @Column(type="integer", name="id_usuario_emprestimo", nullable=false, options={"comment":"Usuário que lançou o empréstimo."})
-	 */
-	private $usuarioEmprestimo;
-    /**
-	 * @ManyToOne(targetEntity="Usuario",fetch="LAZY")
-     * @Column(type="integer", name="id_usuario_devolucao", nullable=true, options={"comment":"Usuário que lançou a devolução."})
-	 */
-	private $usuarioDevolucao;
-    /** 
-     * @Column(type="string", name="dt_emprestimo", columnDefinition="TIMESTAMP NOT NULL", options={"comment":"Data e hora do empréstimo."})
+     * @OneToOne(targetEntity="Pessoa", inversedBy="emprestimo")
      */
-    private $dtEmprestimo;
-    /** 
-     * @Column(type="string", name="dt_devolucao", columnDefinition="TIMESTAMP NOT NULL", options={"comment":"Data e hora da devolução."})
+    private $pessoa;
+    /**
+     * @OneToOne(targetEntity="Chave", inversedBy="emprestimo")
      */
-    private $dtDevolucao;
+    private $chave;
+    /**
+     * @ManyToOne(targetEntity="Usuario", inversedBy="emprestimos")
+     */
+    private $usuario;
+    /**
+     * @Column(type="datetime", 
+     * name="dt_emprestimo", 
+     * unique=false, 
+     * length=20, 
+     * nullable=false, 
+     * columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP"), 
+     * options={"comment":"Data e hora em que esse empréstimo foi lançado."})
+    */
+    private $dtEmprestimo;       
 
     public function getId(): int
     {
@@ -59,38 +49,36 @@ class Emprestimo
     {
         $this->id = $id;
     }
-    
-    public function getPessoa(): Pessoa {
-		return $this->pessoa;
-	}
 
-	public function setPessoa(Pessoa $pessoa): void {
-		$this->pessoa = $pessoa;
-	}
+    public function getPessoa(): Pessoa
+    {
+        return $this->pessoa;
+    }
 
-    public function getChave(): Chave {
-		return $this->chave;
-	}
+    public function setPessoa(Pessoa $pessoa): void
+    {
+        $this->pessoa = $pessoa;
+    }
 
-	public function setChave(Chave $chave): void {
-		$this->chave = $chave;
-	}
+    public function getChave(): Chave
+    {
+        return $this->chave;
+    }
 
-    public function getUsuarioEmprestimo(): Usuario {
-		return $this->usuarioEmprestimo;
-	}
+    public function setChave(Chave $chave): void
+    {
+        $this->chave = $chave;
+    }
 
-	public function setUsuarioEmprestimo(Usuario $usuario): void {
-		$this->usuarioEmprestimo = $usuario;
-	}
+    public function getUsuario(): Usuario
+    {
+        return $this->usuario;
+    }
 
-    public function getUsuarioDevolucao(): Usuario {
-		return $this->usuarioDevolucao;
-	}
-
-	public function setUsuarioDevolucao(Usuario $usuario): void {
-		$this->usuarioDevolucao = $usuario;
-	}
+    public function setUsuario(Usuario $usuario): void
+    {
+        $this->usuario = $usuario;
+    }
 
     public function setDtEmprestimo(string $v): void
     {
@@ -100,15 +88,5 @@ class Emprestimo
     public function getDtEmprestimo(): string
     {
         return $this->dtEmprestimo;
-    }
-
-    public function setDtDevolucao(string $v): void
-    {
-        $this->dtDevolucao = $v;
-    }
-
-    public function getDtDevolucao(): string
-    {
-        return $this->dtDevolucao;
-    }
+    }   
 }

@@ -32,6 +32,8 @@ try {
 	$instituicao = new Instituicao();
 	$instituicao->setSigla($sigla);
 	$instituicao->setNome($nome);
+	$instituicao->setLabelDocumentoPessoa('Nº documento');
+	$instituicao->setLabelIdentificacaoPessoa('Nº identificação');
 	$entityManager->persist($instituicao);
 	$entityManager->flush();
 

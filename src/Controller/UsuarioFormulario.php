@@ -54,6 +54,7 @@ class UsuarioFormulario implements RequestHandlerInterface
 				throw new \Exception("Não foi possível identificar o usuário.", 1);
 			}
             $instituicao = $usuarioAtual->getInstituicao();
+            $prediosSelecionados = [];
             if (empty($dados) and !empty($id)) {    
                 $usuario = $this->repositorioUsuarios->findOneBy(['id' => $id]);
                 if (is_null($usuario)) {
@@ -63,7 +64,6 @@ class UsuarioFormulario implements RequestHandlerInterface
                     throw new \Exception("O usuário selecionado não é da mesma instituição do usuário atual.", 1);
                 }   
                 $prediosUsuario = $usuario->getPredios(); 
-                $prediosSelecionados = [];  
                 foreach ($prediosUsuario as $predio) {  
                     $prediosSelecionados[] = $predio->getId();
                 }                                
@@ -74,8 +74,7 @@ class UsuarioFormulario implements RequestHandlerInterface
                     'email' => $usuario->getEmail(),
                     'observacao' => $usuario->getObservacao(),
                     'administrador' => ($usuario->ehAdm() ? 'S' : 'N'),
-                    'ativo' => ($usuario->estaAtivo() ? 'S' : 'N'),
-                    'predios_selecionados' => $prediosSelecionados                    
+                    'ativo' => ($usuario->estaAtivo() ? 'S' : 'N')                               
                 ];               
             }
             $prediosAtivos = [];
@@ -86,7 +85,8 @@ class UsuarioFormulario implements RequestHandlerInterface
                 }
             }
             $dados['predios'] = $prediosAtivos;
-			$html = $this->renderizaHtml('usuarios/formulario.php', array_merge([
+            $dados['predios_selecionados'] = $prediosSelecionados;
+			$html = $this->renderizaHtml('usuario/formulario.php', array_merge([
           	  'titulo' => $titulo
             ], $dados));
             return new Response(200, [], $html);

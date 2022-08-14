@@ -49,17 +49,18 @@ class PredioRemover implements RequestHandlerInterface
     {
 		try {
 			$dadosUsuario = $this->getSessionUser();
+			$idInstituicao = $this->getSessionUserIdInstituicao();
 			$this->userVerifyAdmin();
 			$id = $this->requestGETInteger('id', $request);
 			if (is_null($id) || $id === false) {
 				throw new \Exception("Identificação de prédio inválida.", 1);
 			}
-			if (empty($dadosUsuario['id_instituicao'])) {
+			if (empty($idInstituicao)) {
 				throw new \Exception("Não foi possível identificar a instituição do usuário atual.", 1);
 			}
 			$this->verificaTemChaves($id);			
 			$predio = $this->repositorioPredios->findOneBy(['id' => $id]);
- 			if ($predio->getInstituicao()->getId() != $dadosUsuario['id_instituicao']) {
+ 			if ($predio->getInstituicao()->getId() != $idInstituicao) {
 				throw new \Exception("O prédio selecionado não é da mesma instituição do usuário atual.", 1);
             }
 			$this->entityManager->remove($predio);

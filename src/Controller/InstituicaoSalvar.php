@@ -75,6 +75,14 @@ class InstituicaoSalvar  implements RequestHandlerInterface
 			if (empty($nome)) {
 				throw new \Exception("Nome não informado.", 1);
 			}
+            $identificacao = $this->requestPOSTString('identificacao', $request);
+			if (empty($identificacao)) {
+				$identificacao = '';
+			}
+            $documento = $this->requestPOSTString('documento', $request);
+			if (empty($documento)) {
+				throw new \Exception("Label do número de documento não informado.", 1);
+			}
 
 			$usuario = $this->getLoggedUser($this->entityManager);
 			$instituicao = $usuario->getInstituicao();
@@ -83,11 +91,13 @@ class InstituicaoSalvar  implements RequestHandlerInterface
 
 			$instituicao->setSigla($sigla);
 			$instituicao->setNome($nome);
+ 			$instituicao->setLabelIdentificacaoPessoa($identificacao);
+ 			$instituicao->setLabelDocumentoPessoa($documento);
  			$this->entityManager->merge($instituicao);
  			$this->entityManager->flush();
 
 			$this->defineFlashMessage('success', 'Informações da instituição atualizadas com sucesso.');
-			$_SESSION['rodape'] = $nome;
+			$this->defineSessionUser($usuario);
 		}
 		catch (\Exception $e) {
 			$this->defineFlashMessage('danger', $e->getMessage());

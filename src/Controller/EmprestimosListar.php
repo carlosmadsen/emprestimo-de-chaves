@@ -32,7 +32,7 @@ class EmprestimosListar  implements RequestHandlerInterface
     {
         $usuario = $this->getLoggedUser($this->entityManager);
              
-        $html = $this->renderizaHtml('emprestimos/listar.php', [
+        $html = $this->renderizaHtml('emprestimo/listar.php', [
             'titulo' => 'Empréstimos: '
         ]); 
         return new Response(200, [], $html);

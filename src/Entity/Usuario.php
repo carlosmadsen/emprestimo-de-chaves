@@ -2,13 +2,8 @@
 
 namespace Emprestimo\Chaves\Entity;
 
-use Emprestimo\Chaves\Entity\Predio;
-use Emprestimo\Chaves\Entity\Emprestimo;
-use Emprestimo\Chaves\Entity\Instituicao;
-
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-
 
 /**
  * @Entity
@@ -26,44 +21,49 @@ class Usuario
      * @Column(type="string", name="login", unique=true, length=255, nullable=false, options={"comment":"Login do usuário."})
      */
     private $login;
-    /** 
+    /**
      * @Column(type="string", name="senha", length=255, nullable=false, options={"comment":"Senha do usuário."})
      */
     private $senha;
-    /** 
+    /**
      * @Column(type="string", name="nome", unique=false, length=255, nullable=false, options={"comment":"Nome do usuário."})
      */
     private $nome;
-    /** 
+    /**
      * @Column(type="string", name="fl_adm", columnDefinition="CHAR(1) NOT NULL", options={"comment":"FLag que define se o usuário é administrador (valor igual a 'S') ou não (valor igual a 'N'). Se for adm ele pode cadastrar usuários e prédios senão ele só pode emprestar chaves."})
      */
     private $flAdm;
-    /** 
+    /**
      * @Column(type="string", name="observacao", nullable=true, options={"comment":"Observações referentes a este usuário."})
      */
-    private $observacao;    
-    /** 
+    private $observacao;
+    /**
      * @Column(type="string", name="fl_ativo", columnDefinition="CHAR(1) NOT NULL", options={"comment":"FLag que define se o usuário ainda está ativo."})
      */
     private $flAtivo;
-    /** 
+    /**
      * @Column(type="string", name="email", nullable=false, options={"comment":"E-mail do usuário."})
      */
     private $email;
     /**
      * @ManyToOne(targetEntity="Instituicao", inversedBy="usuarios")
-     */  
-	private $instituicao;
+     */
+    private $instituicao;
     /**
      * @ManyToMany(targetEntity="Predio", mappedBy="usuarios", cascade={"persist"})
      */
-    private $predios;   
+    private $predios;
+    /**
+     * @OneToMany(targetEntity="Emprestimo", mappedBy="usuario")
+     */
+    private $emprestimos;
 
-    public function __construct() {
-	    $this->predios = new ArrayCollection();
-    	//$this->emprestimosEmprestimo = new ArrayCollection();
-		//$this->emprestimosDevolucao = new ArrayCollection();
-	}
+
+    public function __construct()
+    {
+        $this->predios = new ArrayCollection();
+        $this->emprestimos = new ArrayCollection();
+    }
 
     public function getId(): int
     {
@@ -74,7 +74,7 @@ class Usuario
     {
         $this->id = $id;
     }
-    
+
     public function setLogin(string $v): void
     {
         $this->login = $v;
@@ -117,7 +117,7 @@ class Usuario
 
     public function getAdm(): bool
     {
-       return $this->ehAdm();
+        return $this->ehAdm();
     }
 
     public function ehAdm(): bool
@@ -143,7 +143,7 @@ class Usuario
     public function getEmail(): string
     {
         return $this->email;
-    }    
+    }
 
     public function setAtivo(bool $fl): void
     {
@@ -152,60 +152,53 @@ class Usuario
 
     public function getAtivo(): bool
     {
-       return $this->estaAtivo();
+        return $this->estaAtivo();
     }
 
     public function estaAtivo(): bool
     {
         return $this->flAtivo == 'S';
     }
-   
-    public function addPredio(Predio $predio) {
-		if (!$this->predios->contains($predio)) {
+
+    public function addPredio(Predio $predio)
+    {
+        if (!$this->predios->contains($predio)) {
             $this->predios->add($predio);
-		    $predio->addUsuario($this);
+            $predio->addUsuario($this);
         }
     }
 
-	public function getPredios() {
-    	return $this->predios;
-	}
+    public function getPredios()
+    {
+        return $this->predios;
+    }
 
-    public function removePredio(Predio $predio) {
-		if ($this->predios->contains($predio)) {
+    public function removePredio(Predio $predio)
+    {
+        if ($this->predios->contains($predio)) {
             $this->predios->removeElement($predio);
-		    $predio->removeUsuario($this);
+            $predio->removeUsuario($this);
         }
     }
 
+    public function addEmprestimo(Emprestimo $emprestimo)
+    {        
+        $this->emprestimos->add($emprestimo);
+        $emprestimo->setUsuario($this);       
+    }
 
-    /*public function addEmprestimoEmprestimo(Emprestimo $emprestimo):  void {
-	    if (!$this->emprestimosEmprestimo->contains($emprestimo)) {
-    		$this->emprestimosEmprestimo->add($emprestimo);
-    		$emprestimo->setUsuarioEmprestimo($this);
-		}
-	}*/
+    public function getEmprestimos()
+    {
+        return $this->emprestimos;
+    }
 
-	/*public function getEmprestimosEmprestimo(): Collection {
-    	return $this->emprestimosEmprestimo;
-	}*/
+    public function getInstituicao(): Instituicao
+    {
+        return $this->instituicao;
+    }
 
-    /*public function addEmprestimoDevolucao(Emprestimo $emprestimo):  void {
-	    if (!$this->emprestimosDevolucao->contains($emprestimo)) {
-    		$this->emprestimosDevolucao->add($emprestimo);
-    		$emprestimo->setUsuarioDevolucao($this);
-		}
-	}*/
-
-	/*public function getEmprestimosDevolucao(): Collection {
-    	return $this->emprestimosDevolucao;
-	}*/
-
-    public function getInstituicao(): Instituicao {
-		return $this->instituicao;
-	}
-
-	public function setInstituicao(Instituicao $instituicao): void {
-		$this->instituicao = $instituicao;
-	}
+    public function setInstituicao(Instituicao $instituicao): void
+    {
+        $this->instituicao = $instituicao;
+    }
 }

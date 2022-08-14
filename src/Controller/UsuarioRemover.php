@@ -50,20 +50,21 @@ class UsuarioRemover implements RequestHandlerInterface
     {
 		try {
 			$dadosUsuario = $this->getSessionUser();
+			$idInstituicao = $this->getSessionUserIdInstituicao();
 			$this->userVerifyAdmin();
 			$id = $this->requestGETInteger('id', $request);
 			if (is_null($id) || $id === false) {
 				throw new \Exception("Identificação de usuário inválida.", 1);
 			}
-			if (empty($dadosUsuario['id_instituicao'])) {
+			if (empty($idInstituicao)) {
 				throw new \Exception("Não foi possível identificar a instituição do usuário atual.", 1);
 			}
 			if ($id == $dadosUsuario['id']) {
 				throw new \Exception("Não é permitido remover o seu próprio usuário.", 1);
 			}
-			$this->verificaRemocaoUltimoAdm($id, $dadosUsuario['id_instituicao']);
+			$this->verificaRemocaoUltimoAdm($id, $idInstituicao);
 			$usuario = $this->repositorioUsuarios->findOneBy(['id' => $id]);
- 			if ($usuario->getInstituicao()->getId() != $dadosUsuario['id_instituicao']) {
+ 			if ($usuario->getInstituicao()->getId() != $idInstituicao) {
 				throw new \Exception("O usuário selecionado não é da mesma instituição do usuário atual.", 1);
             }
 			$this->entityManager->remove($usuario);

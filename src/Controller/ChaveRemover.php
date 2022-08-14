@@ -49,16 +49,17 @@ class ChaveRemover implements RequestHandlerInterface
     {
 		try {
 			$dadosUsuario = $this->getSessionUser();
+			$idInstituicao = $this->getSessionUserIdInstituicao();
 			$this->userVerifyAdmin();
 			$id = $this->requestGETInteger('id', $request);
 			if (is_null($id) || $id === false) {
 				throw new \Exception("Identificação de chave inválida.", 1);
 			}
-			if (empty($dadosUsuario['id_instituicao'])) {
+			if (empty($idInstituicao)) {
 				throw new \Exception("Não foi possível identificar a instituição do usuário atual.", 1);
 			}			
 			$chave = $this->repositorioDeChaves->findOneBy(['id' => $id]);
- 			if ($chave->getPredio()->getInstituicao()->getId() != $dadosUsuario['id_instituicao']) {
+ 			if ($chave->getPredio()->getInstituicao()->getId() != $idInstituicao) {
 				throw new \Exception("A chave selecionada é de um prédio que não é da mesma instituição do usuário atual.", 1);
             }
 			$this->entityManager->remove($chave);

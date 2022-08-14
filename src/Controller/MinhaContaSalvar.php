@@ -54,6 +54,8 @@ class MinhaContaSalvar  implements RequestHandlerInterface
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
 		$dadosUsuario = $this->getSessionUser();
+        $id = $dadosUsuario['id'];
+        $idInstituicao = $this->getSessionUserIdInstituicao();
         $login = $this->requestPOSTString('login', $request);
         $nome = $this->requestPOSTString('nome', $request);
         $email = $this->requestPOSTString('email', $request);        
@@ -77,7 +79,7 @@ class MinhaContaSalvar  implements RequestHandlerInterface
             if (empty($senhaAtual)) {
                 throw new \Exception("Senha atual não informada.", 1);
             }
-            $this->verificaDuplicacaoLogin($login, $dadosUsuario['id_instituicao'], $dadosUsuario['id_instituicao']);
+            $this->verificaDuplicacaoLogin($login, $idInstituicao, $id);
             $usuario = $this->getLoggedUser($this->entityManager);
             if (!$usuario->senhaEstaCorreta($senhaAtual)) {
 				throw new \Exception("Senha atual inválida.", 1);

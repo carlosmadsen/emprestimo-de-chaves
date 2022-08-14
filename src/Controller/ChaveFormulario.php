@@ -40,7 +40,7 @@ class ChaveFormulario implements RequestHandlerInterface
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $dadosUsuario = $this->getSessionUser();
-        $idInstituicao = $dadosUsuario['id_instituicao'];
+        $idInstituicao = $this->getSessionUserIdInstituicao();
         $id = $this->requestGETInteger('id', $request);
         $titulo = ( empty($id) ? 'Nova chave' : 'Alterar chave');
         $dados = $this->getFlashData();
@@ -66,7 +66,7 @@ class ChaveFormulario implements RequestHandlerInterface
             }		
 			$predios = $this->getPredios($idInstituicao);
             $dados['predios'] = $predios;
-        	$html = $this->renderizaHtml('chaves/formulario.php', array_merge([
+        	$html = $this->renderizaHtml('chave/formulario.php', array_merge([
           	  'titulo' => $titulo
             ], $dados));
             return new Response(200, [], $html);
