@@ -53,27 +53,28 @@ class PessoaFormulario implements RequestHandlerInterface
 				throw new \Exception("Não foi possível identificar o usuário.", 1);
 			}
             $this->userVerifyAdmin();
-          	$instituicao = $usuarioAtual->getInstituicao();
-			$dados = [
-				'titulo' => $titulo,				
-				'labelIdentificacao' => $this->getSessionUserLabelIdentificacaoPessoa(),
-				'labelDocumento' => $this->getSessionUserLabelDocumentoPessoa()
-			];
-           	if (empty($dados) and !empty($id)) {    
+          	$instituicao = $usuarioAtual->getInstituicao();			
+           	if (empty($dados) and !empty($id)) {   
+              
                 $pessoa = $this->repositorioDePessoas->findOneBy(['id' => $id]);
                 if (is_null($pessoa)) {
                     throw new \Exception("Não foi possível identificar a pessoa.", 1);
                 }               
                 if ($pessoa->getInstituicao()->getId() != $instituicao->getId()) {
                     throw new \Exception("A pessoa selecionada não é da mesma instituição do usuário atual.", 1);
-                }                                              
-                $dados = array_merge($dados, [
+                }   
+                $dados = [
                     'id' => $id,
                     'nome' => $pessoa->getNome(),
                     'identificacao' => $pessoa->getNrIdentificacao(),
                     'documento' => $pessoa->getNrDocumento()
-		        ]);
-            }			
+		        ];                                    
+            }
+            $dados = array_merge($dados, [
+				'titulo' => $titulo,				
+				'labelIdentificacao' => $this->getSessionUserLabelIdentificacaoPessoa(),
+				'labelDocumento' => $this->getSessionUserLabelDocumentoPessoa()
+			]);			
 			$html = $this->renderizaHtml('pessoa/formulario.php',  $dados);
             return new Response(200, [], $html);
 		}

@@ -51,14 +51,16 @@ require __DIR__ . '/../inicio-html.php'; ?>
 			<th scope="col"><?= $labelIdentificacao ?></th>
 			<?php endif; ?>
 		<th scope="col"><?= $labelDocumento ?></th>
-		<th scope="col">nome</th>
+		<th scope="col">Nome</th>
 		<th scope="col">Operações</th>
 		</tr>
 	</thead>
 	<tbody>
 		<?php foreach ($pessoas as $pessoa): ?>
 		<tr>
-		<td><?= $pessoa->getNrIdentificacao(); ?></td>
+			<?php if (!empty($labelIdentificacao) > 0) : ?>
+			<td><?= $pessoa->getNrIdentificacao(); ?></td>
+			<?php endif; ?>
 		<td><?= $pessoa->getNrDocumento(); ?></td>
 		<td><?= $pessoa->getNome(); ?></td>
 		<td style="text-align:center;" >   

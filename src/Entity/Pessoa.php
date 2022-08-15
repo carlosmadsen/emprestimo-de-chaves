@@ -114,7 +114,7 @@ class Pessoa
         $this->instituicao = $instituicao;
     }
 
-    public function getEmprestimo(): Emprestimo
+    public function getEmprestimo()
     {
         return $this->emprestimo;
     }

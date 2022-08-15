@@ -22,7 +22,7 @@
                 name="documento" 
                 class="form-control"
 				required="required"
-                value="<?= isset($idocumento) ? $documento : ''; ?>"
+                value="<?= isset($documento) ? $documento : ''; ?>"
             >
         </div> 
 
