@@ -28,13 +28,11 @@ class UsuarioListar implements RequestHandlerInterface
 	use RequestTrait;
 	use SessionFilterTrait;
 
-    private $repositorioDeUsuarios;
     private $entityManager;
 
     public function __construct(EntityManagerInterface $entityManager)
     {
         $this->entityManager = $entityManager;
-        $this->repositorioDeUsuarios = $this->entityManager->getRepository(Usuario::class);
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface

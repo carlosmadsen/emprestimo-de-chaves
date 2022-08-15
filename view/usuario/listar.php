@@ -80,7 +80,7 @@ require __DIR__ . '/../inicio-html.php'; ?>
   <tbody>
     <?php foreach ($usuarios as $usuario): ?>
     <tr>
-      <th><?= $usuario->getLogin(); ?></th>
+      <td><?= $usuario->getLogin(); ?></td>
       <td><?= $usuario->getNome(); ?></td>
       <td style="text-align:center;" ><?= ($usuario->ehAdm() ? 'Sim' : 'Não'); ?></td>
       <td style="text-align:center;" ><?= ($usuario->estaAtivo() ? 'Sim' : 'Não'); ?></td>

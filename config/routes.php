@@ -20,7 +20,9 @@ use Emprestimo\Chaves\Controller\{
     ChaveListar,
     ChaveFormulario,
     ChaveSalvar,
-    ChaveRemover
+    ChaveRemover,
+    PessoaListar,
+    PessoaFormulario,    
 };
 
 $rotas = [
@@ -48,6 +50,9 @@ $rotas = [
     '/alterar-chave' => ChaveFormulario::class,
     '/salvar-chave' => ChaveSalvar::class,
     '/remover-chave' => ChaveRemover::class,
+    '/pessoas' => PessoaListar::class,
+    '/nova-pessoa' => PessoaFormulario::class,
+    '/alterar-pessoa' => PessoaFormulario::class,
 ];
 
 return $rotas;
