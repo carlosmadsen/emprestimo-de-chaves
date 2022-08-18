@@ -35,16 +35,17 @@ class ChaveListar implements RequestHandlerInterface {
 	public function handle(ServerRequestInterface $request): ResponseInterface {
 		$dadosUsuario = $this->getSessionUser();
 		$this->clearFlashData();
-		$this->defineSessionFilterKey('chaves');	
+		$this->defineSessionFilterKey('chaves');
+		$newFilter = $this->requestGETInteger('filtrar', $request) == 1;
 		$cleanFilterSession = $this->requestGETInteger('limparFiltro', $request) == 1;
 		if ($cleanFilterSession) {
 			$this->clearFilterSession();
 		}
 		$idInstituicao = $this->getSessionUserIdInstituicao();
-		$idPredio = $this->requestPOSTInteger('predio', $request) ? : $this->getFilterSession('predio');
-		$numero = $this->requestPOSTString('numero', $request) ? : $this->getFilterSession('numero');
-		$descricao = $this->requestPOSTString('descricao', $request) ? : $this->getFilterSession('descricao');
-		$ativo = $this->requestPOSTString('ativo', $request) ? : $this->getFilterSession('ativo');
+		$idPredio = $this->requestPOSTInteger('predio', $request) ? : (!$newFilter ? $this->getFilterSession('predio') : null);
+		$numero = $this->requestPOSTString('numero', $request) ? : (!$newFilter ? $this->getFilterSession('numero') : null);
+		$descricao = $this->requestPOSTString('descricao', $request) ? : (!$newFilter ? $this->getFilterSession('descricao') : null);
+		$ativo = $this->requestPOSTString('ativo', $request) ? : (!$newFilter ? $this->getFilterSession('ativo') : null);
 		$temPesquisa = (!empty($idPredio) or !empty($numero) or !empty($ativo));
 		if ($temPesquisa) {
 			$this->defineFilterSesssion([
@@ -53,6 +54,9 @@ class ChaveListar implements RequestHandlerInterface {
 				'ativo' => $ativo,
 				'predio' => $idPredio
 			]);
+		}
+		else {
+			$this->clearFilterSession();
 		}
 		try {
 			$this->userVerifyAdmin();

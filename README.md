@@ -10,7 +10,7 @@ git clone https://github.com/carlosmadsen/emprestimo-de-chaves.git
 cd emprestimo-de-chaves
 composer install 
 ```
-Criação do banco de dados sqlite (no windows).
+Criação do banco de dados sqlite.
 ```
 php .\commands\doctrine.php orm:schema-tool:create
 ```

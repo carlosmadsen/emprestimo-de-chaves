@@ -21,14 +21,12 @@ class ChaveRemover implements RequestHandlerInterface
 	use FlashMessageTrait;
 	use SessionUserTrait;
 	use RequestTrait;
-
-	private $repositorioDeChaves;
+	
 	private $entityManager;
 
 	public function __construct(EntityManagerInterface $entityManager)
     {
-        $this->entityManager = $entityManager;
-		$this->repositorioDeChaves = $this->entityManager->getRepository(Chave::class);
+        $this->entityManager = $entityManager;		
     }
 
 	private function verificaTemEmprestimos($idChave) {
@@ -58,7 +56,7 @@ class ChaveRemover implements RequestHandlerInterface
 			if (empty($idInstituicao)) {
 				throw new \Exception("Não foi possível identificar a instituição do usuário atual.", 1);
 			}			
-			$chave = $this->repositorioDeChaves->findOneBy(['id' => $id]);
+			$chave = $this->entityManager->find(Chave::class, $id);
  			if ($chave->getPredio()->getInstituicao()->getId() != $idInstituicao) {
 				throw new \Exception("A chave selecionada é de um prédio que não é da mesma instituição do usuário atual.", 1);
             }

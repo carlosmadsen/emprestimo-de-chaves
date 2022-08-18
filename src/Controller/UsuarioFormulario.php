@@ -22,51 +22,48 @@ use Doctrine\ORM\EntityManagerInterface;
 class UsuarioFormulario implements RequestHandlerInterface
 {
     use RenderizadorDeHtmlTrait;
-	use FlashMessageTrait;
+    use FlashMessageTrait;
     use FlashDataTrait;
     use SessionUserTrait;
     use RequestTrait;
 
     private $repositorioUsuarios;
-    private $entityManager;
 
     public function __construct(EntityManagerInterface $entityManager)
     {
         $this->entityManager = $entityManager;
-        $this->repositorioUsuarios = $this->entityManager->getRepository(Usuario::class);
     }
 
-    private function getPrediosInstituicao() 
+    private function getPrediosInstituicao()
     {
-
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
-    {        
+    {
         $id = $this->requestGETInteger('id', $request);
-        $titulo = ( empty($id) ? 'Novo usuário' : 'Alterar usuário');
+        $titulo = (empty($id) ? 'Novo usuário' : 'Alterar usuário');
         $dados = $this->getFlashData();
         $this->clearFlashData();
         try {
             $this->userVerifyAdmin();
-            $usuarioAtual = $this->getLoggedUser($this->entityManager);	
-			if (is_null($usuarioAtual)) {
-				throw new \Exception("Não foi possível identificar o usuário.", 1);
-			}
+            $usuarioAtual = $this->getLoggedUser($this->entityManager);
+            if (is_null($usuarioAtual)) {
+                throw new \Exception("Não foi possível identificar o usuário.", 1);
+            }
             $instituicao = $usuarioAtual->getInstituicao();
             $prediosSelecionados = [];
-            if (empty($dados) and !empty($id)) {    
-                $usuario = $this->repositorioUsuarios->findOneBy(['id' => $id]);
+            if (empty($dados) and !empty($id)) {
+                $usuario = $this->entityManager->find(Usuario::class, $id);
                 if (is_null($usuario)) {
                     throw new \Exception("Não foi possível identificar o usuário.", 1);
-                }               
+                }
                 if ($usuario->getInstituicao()->getId() != $instituicao->getId()) {
                     throw new \Exception("O usuário selecionado não é da mesma instituição do usuário atual.", 1);
-                }   
-                $prediosUsuario = $usuario->getPredios(); 
-                foreach ($prediosUsuario as $predio) {  
+                }
+                $prediosUsuario = $usuario->getPredios();
+                foreach ($prediosUsuario as $predio) {
                     $prediosSelecionados[] = $predio->getId();
-                }                                
+                }
                 $dados = [
                     'id' => $id,
                     'login' => $usuario->getLogin(),
@@ -74,8 +71,8 @@ class UsuarioFormulario implements RequestHandlerInterface
                     'email' => $usuario->getEmail(),
                     'observacao' => $usuario->getObservacao(),
                     'administrador' => ($usuario->ehAdm() ? 'S' : 'N'),
-                    'ativo' => ($usuario->estaAtivo() ? 'S' : 'N')                               
-                ];               
+                    'ativo' => ($usuario->estaAtivo() ? 'S' : 'N')
+                ];
             }
             $prediosAtivos = [];
             $predios = $instituicao->getPredios();
@@ -86,14 +83,13 @@ class UsuarioFormulario implements RequestHandlerInterface
             }
             $dados['predios'] = $prediosAtivos;
             $dados['predios_selecionados'] = $prediosSelecionados;
-			$html = $this->renderizaHtml('usuario/formulario.php', array_merge([
-          	  'titulo' => $titulo
+            $html = $this->renderizaHtml('usuario/formulario.php', array_merge([
+                'titulo' => $titulo
             ], $dados));
             return new Response(200, [], $html);
-		}
-		catch (\Exception $e) {
-			$this->defineFlashMessage('danger', $e->getMessage());
-			return new Response(302, ['Location' => '/usuarios'], null);
-		}
+        } catch (\Exception $e) {
+            $this->defineFlashMessage('danger', $e->getMessage());
+            return new Response(302, ['Location' => '/usuarios'], null);
+        }
     }
 }

@@ -38,7 +38,8 @@ class UsuarioListar implements RequestHandlerInterface
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
 		$this->clearFlashData();
-		$this->defineSessionFilterKey('usuarios');	
+		$this->defineSessionFilterKey('usuarios');
+		$newFilter = $this->requestGETInteger('filtrar', $request) == 1;	
 		$cleanFilterSession = $this->requestGETInteger('limparFiltro', $request) == 1;
 		if ($cleanFilterSession) {
 			$this->clearFilterSession();
@@ -50,11 +51,11 @@ class UsuarioListar implements RequestHandlerInterface
 			}
 			$instituicao = $usuarioAtual->getInstituicao();
 			$idInstituicao = $instituicao->getId();
-			$login = $this->requestPOSTString('login', $request) ? : $this->getFilterSession('login');
-			$nome = $this->requestPOSTString('nome', $request) ? : $this->getFilterSession('nome');
-			$ativo = $this->requestPOSTString('ativo', $request) ? : $this->getFilterSession('ativo');
-			$administrador = $this->requestPOSTString('administrador', $request) ? : $this->getFilterSession('administrador');
-			$idPredio = $this->requestPOSTInteger('predio', $request) ? : $this->getFilterSession('predio');	
+			$login = $this->requestPOSTString('login', $request) ? : (!$newFilter ? $this->getFilterSession('login') : null);
+			$nome = $this->requestPOSTString('nome', $request) ? :  (!$newFilter ? $this->getFilterSession('nome') : null);
+			$ativo = $this->requestPOSTString('ativo', $request) ? :  (!$newFilter ? $this->getFilterSession('ativo') : null);
+			$administrador = $this->requestPOSTString('administrador', $request) ? :  (!$newFilter ? $this->getFilterSession('administrador') : null);
+			$idPredio = $this->requestPOSTInteger('predio', $request) ? : (!$newFilter ? $this->getFilterSession('predio') : null);	
 			$temPesquisa = (!empty($login) or !empty($nome) or !empty($ativo) or !empty($administrador) or !empty($idPredio));
 			$this->userVerifyAdmin();		
 			if (empty($idInstituicao)) {
@@ -68,6 +69,9 @@ class UsuarioListar implements RequestHandlerInterface
 					'administrador' => $administrador,
 					'predio' => $idPredio
 				]);
+			}
+			else {
+				$this->clearFilterSession();
 			}
 			$prediosAtivos = [];
             $predios = $instituicao->getPredios();

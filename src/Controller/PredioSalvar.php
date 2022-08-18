@@ -18,23 +18,22 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Doctrine\ORM\EntityManagerInterface;
 
-class PredioSalvar  implements RequestHandlerInterface
+class PredioSalvar implements RequestHandlerInterface
 {
-	use FlashMessageTrait;
+    use FlashMessageTrait;
     use FlashDataTrait;
     use SessionUserTrait;
-	use RequestTrait;
+    use RequestTrait;
 
-    private $repositorioPredios;
     private $entityManager;
 
     public function __construct(EntityManagerInterface $entityManager)
     {
         $this->entityManager = $entityManager;
-        $this->repositorioPredios = $this->entityManager->getRepository(Predio::class);
     }
 
-    private function verificaDuplicacaoNome($nome, $idInstituicao, $idPredio = null) {
+    private function verificaDuplicacaoNome($nome, $idInstituicao, $idPredio = null)
+    {
         $dql = 'SELECT 
             predio 
         FROM '.Predio::class.' predio 
@@ -50,57 +49,55 @@ class PredioSalvar  implements RequestHandlerInterface
         if (count($predios)>0) {
             throw new \Exception('Já existe um prédio cadastrado com o nome "'.$predios[0]->getNome().'".', 1);
         }
-    }    
+    }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $id = $this->requestGETInteger('id', $request);
-		$nome = $this->requestPOSTString('nome', $request);
-		$ativo = $this->requestPOSTString('ativo', $request);
+        $nome = $this->requestPOSTString('nome', $request);
+        $ativo = $this->requestPOSTString('ativo', $request);
         if (empty($ativo)) {
             $ativo = 'S';
         }
-		try {
-            $this->userVerifyAdmin();	            
-		    if (empty($nome)) {
+        try {
+            $this->userVerifyAdmin();
+            if (empty($nome)) {
                 throw new \Exception("Nome não informado.", 1);
-            }		   
-			$usuarioAtual = $this->getLoggedUser($this->entityManager);		
-			if (is_null($usuarioAtual)) {
-				throw new \Exception("Não foi possível identificar o usuário.", 1);
-			}
+            }
+            $usuarioAtual = $this->getLoggedUser($this->entityManager);
+            if (is_null($usuarioAtual)) {
+                throw new \Exception("Não foi possível identificar o usuário.", 1);
+            }
             $instituicao = $usuarioAtual->getInstituicao();
             $this->verificaDuplicacaoNome($nome, $instituicao->getId(), $id);
             $predio = new Predio();
             $predio->setInstituicao($instituicao);
             $predio->setNome($nome);
-		    $predio->setAtivo($ativo == 'S');
-            if (!is_null($id) && $id !== false) { //atualizar                 
+            $predio->setAtivo($ativo == 'S');
+            if (!is_null($id) && $id !== false) { //atualizar
                 $predio->setId($id);
                 $this->entityManager->merge($predio);
-                $this->defineFlashMessage('success', 'Prédio alterado com sucesso.');               
-            } else { //inserir        
+                $this->defineFlashMessage('success', 'Prédio alterado com sucesso.');
+            } else { //inserir
                 $this->entityManager->persist($predio);
                 $this->defineFlashMessage('success', 'Prédio cadastrado com sucesso.');
             }
             $this->entityManager->flush();
             $rota = '/predios';
             $this->clearFlashData();
-		}
-		catch (\Exception $e) {
+        } catch (\Exception $e) {
             $this->defineFlashData([
-                'id' => $id,                
-                'nome' => $nome,                
+                'id' => $id,
+                'nome' => $nome,
                 'ativo' => $ativo
             ]);
             if (!empty($id)) {
                 $rota = '/alterar-predio?id='.$id;
-            }
-            else {
+            } else {
                 $rota = '/novo-predio';
             }
-			$this->defineFlashMessage('danger', $e->getMessage());
-		}
-		return new Response(302, ['Location' => $rota], null);
+            $this->defineFlashMessage('danger', $e->getMessage());
+        }
+        return new Response(302, ['Location' => $rota], null);
     }
 }

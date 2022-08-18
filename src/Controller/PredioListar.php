@@ -35,19 +35,23 @@ class PredioListar implements RequestHandlerInterface {
 		$dadosUsuario = $this->getSessionUser();
 		$this->clearFlashData();
 		$this->defineSessionFilterKey('predios');	
+		$newFilter = $this->requestGETInteger('filtrar', $request) == 1;	
 		$cleanFilterSession = $this->requestGETInteger('limparFiltro', $request) == 1;
 		if ($cleanFilterSession) {
 			$this->clearFilterSession();
 		}
 		$idInstituicao = $this->getSessionUserIdInstituicao();
-		$nome = $this->requestPOSTString('nome', $request) ? : $this->getFilterSession('nome');;
-		$ativo = $this->requestPOSTString('ativo', $request) ? : $this->getFilterSession('ativo');;
+		$nome = $this->requestPOSTString('nome', $request) ? : (!$newFilter ? $this->getFilterSession('nome') : null);
+		$ativo = $this->requestPOSTString('ativo', $request) ? : (!$newFilter ? $this->getFilterSession('ativo') : null);
 		$temPesquisa = (!empty($nome) or !empty($ativo));
 		if ($temPesquisa) {			
 			$this->defineFilterSesssion([
 				'nome' => $nome,
 				'ativo' => $ativo
 			]);
+		}
+		else {
+			$this->clearFilterSession();
 		}
 		try {
 			$this->userVerifyAdmin();

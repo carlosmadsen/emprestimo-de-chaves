@@ -7,7 +7,7 @@ require __DIR__ . '/../inicio-html.php'; ?>
 
 
 
-<form  action="/predios" method="post" >
+<form  action="/predios?filtrar=1" method="post" >
 
  <div class="form-row">
 
@@ -28,7 +28,7 @@ require __DIR__ . '/../inicio-html.php'; ?>
    <div class="form-group col-md-2">
      <label></label>
         <div>
-            <button type="submit" class="btn btn-primary mb-2">Pesquisar</button>
+            <button type="submit" class="btn btn-primary mb-2">Filtrar</button>
             <?php if ($temPesquisa) : ?>
               <a href="/predios?limparFiltro=1" class="btn btn-secondary mb-2" >
               Limpar

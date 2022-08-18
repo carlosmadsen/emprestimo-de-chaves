@@ -17,21 +17,20 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class UsuarioRemover implements RequestHandlerInterface
 {
-	use FlashMessageTrait;
-	use SessionUserTrait;
-	use RequestTrait;
+    use FlashMessageTrait;
+    use SessionUserTrait;
+    use RequestTrait;
 
-	private $repositorioUsuarios;
-	private $entityManager;
+    private $entityManager;
 
-	public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(EntityManagerInterface $entityManager)
     {
         $this->entityManager = $entityManager;
-		$this->repositorioUsuarios = $this->entityManager->getRepository(Usuario::class);
     }
 
-	private function verificaRemocaoUltimoAdm($idUsuario, $idInstituicao) {
-		$dql = 'SELECT 
+    private function verificaRemocaoUltimoAdm($idUsuario, $idInstituicao)
+    {
+        $dql = 'SELECT 
             usuario 
         FROM '.Usuario::class.' usuario 
         JOIN usuario.instituicao instituicao
@@ -44,36 +43,35 @@ class UsuarioRemover implements RequestHandlerInterface
         if (count($usuarios)<1) {
             throw new \Exception('Não é permitido remover o último usuário administrativo.', 1);
         }
-	}
+    }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-		try {
-			$dadosUsuario = $this->getSessionUser();
-			$idInstituicao = $this->getSessionUserIdInstituicao();
-			$this->userVerifyAdmin();
-			$id = $this->requestGETInteger('id', $request);
-			if (is_null($id) || $id === false) {
-				throw new \Exception("Identificação de usuário inválida.", 1);
-			}
-			if (empty($idInstituicao)) {
-				throw new \Exception("Não foi possível identificar a instituição do usuário atual.", 1);
-			}
-			if ($id == $dadosUsuario['id']) {
-				throw new \Exception("Não é permitido remover o seu próprio usuário.", 1);
-			}
-			$this->verificaRemocaoUltimoAdm($id, $idInstituicao);
-			$usuario = $this->repositorioUsuarios->findOneBy(['id' => $id]);
- 			if ($usuario->getInstituicao()->getId() != $idInstituicao) {
-				throw new \Exception("O usuário selecionado não é da mesma instituição do usuário atual.", 1);
+        try {
+            $dadosUsuario = $this->getSessionUser();
+            $idInstituicao = $this->getSessionUserIdInstituicao();
+            $this->userVerifyAdmin();
+            $id = $this->requestGETInteger('id', $request);
+            if (is_null($id) || $id === false) {
+                throw new \Exception("Identificação de usuário inválida.", 1);
             }
-			$this->entityManager->remove($usuario);
-			$this->entityManager->flush();
-			$this->defineFlashMessage('success', 'Usuário removido com sucesso.');
-		}
-		catch (\Exception $e) {
-			$this->defineFlashMessage('danger', $e->getMessage());
-		}
-		return new Response(302, ['Location' => '/usuarios'], null);
+            if (empty($idInstituicao)) {
+                throw new \Exception("Não foi possível identificar a instituição do usuário atual.", 1);
+            }
+            if ($id == $dadosUsuario['id']) {
+                throw new \Exception("Não é permitido remover o seu próprio usuário.", 1);
+            }
+            $this->verificaRemocaoUltimoAdm($id, $idInstituicao);
+            $usuario = $this->entityManager->find(Usuario::class, $id);
+            if ($usuario->getInstituicao()->getId() != $idInstituicao) {
+                throw new \Exception("O usuário selecionado não é da mesma instituição do usuário atual.", 1);
+            }
+            $this->entityManager->remove($usuario);
+            $this->entityManager->flush();
+            $this->defineFlashMessage('success', 'Usuário removido com sucesso.');
+        } catch (\Exception $e) {
+            $this->defineFlashMessage('danger', $e->getMessage());
+        }
+        return new Response(302, ['Location' => '/usuarios'], null);
     }
 }

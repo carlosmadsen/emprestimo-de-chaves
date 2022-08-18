@@ -40,6 +40,7 @@ class PessoaListar implements RequestHandlerInterface
     {
 		$this->clearFlashData();
 		$this->defineSessionFilterKey('pessoas');	
+		$newFilter = $this->requestGETInteger('filtrar', $request) == 1;
 		$cleanFilterSession = $this->requestGETInteger('limparFiltro', $request) == 1;
 		if ($cleanFilterSession) {
 			$this->clearFilterSession();
@@ -54,9 +55,9 @@ class PessoaListar implements RequestHandlerInterface
 			if (empty($idInstituicao)) {
 				throw new \Exception("Não foi possível identificar a instituição do usuário atual.", 1);
 			}
-			$nome = $this->requestPOSTString('nome', $request) ? : $this->getFilterSession('nome');
-			$identificacao = $this->requestPOSTString('identificacao', $request) ? : $this->getFilterSession('identificacao');
-			$documento = $this->requestPOSTString('documento', $request) ? : $this->getFilterSession('documento');
+			$nome = $this->requestPOSTString('nome', $request) ? : (!$newFilter ? $this->getFilterSession('nome') : null);
+			$identificacao = $this->requestPOSTString('identificacao', $request) ? : (!$newFilter ? $this->getFilterSession('identificacao'): null);
+			$documento = $this->requestPOSTString('documento', $request) ? : (!$newFilter ? $this->getFilterSession('documento'): null);
 			$temPesquisa = (!empty($nome) or !empty($identificacao) or !empty($documento));
 			$dados = [
 				'titulo' => 'Pessoas',
@@ -97,6 +98,9 @@ class PessoaListar implements RequestHandlerInterface
 					'identificacao' => $identificacao,
 					'documento' => $documento
 				]);
+			}
+			else {
+				$this->clearFilterSession();
 			}
 			$html = $this->renderizaHtml('pessoa/listar.php', $dados);
 			return new Response(200, [], $html);

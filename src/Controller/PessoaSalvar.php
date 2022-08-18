@@ -17,21 +17,22 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Doctrine\ORM\EntityManagerInterface;
 
-class PessoaSalvar implements RequestHandlerInterface {
-	use FlashMessageTrait;
-	use FlashDataTrait;
-	use SessionUserTrait;
-	use RequestTrait;
+class PessoaSalvar implements RequestHandlerInterface
+{
+    use FlashMessageTrait;
+    use FlashDataTrait;
+    use SessionUserTrait;
+    use RequestTrait;
 
-	private $repositorioDePessoas;
-	private $entityManager;
+    private $entityManager;
 
-	public function __construct(EntityManagerInterface $entityManager) {
-		$this->entityManager = $entityManager;
-		$this->repositorioDePessoas = $this->entityManager->getRepository(Pessoa::class);
-	}
+    public function __construct(EntityManagerInterface $entityManager)
+    {
+        $this->entityManager = $entityManager;
+    }
 
-	private function verificaDuplicacaoNome($nome, $idInsituicao, $idPessoa = null) {
+    private function verificaDuplicacaoNome($nome, $idInsituicao, $idPessoa = null)
+    {
         $dql = 'SELECT 
             pessoa 
         FROM '.Pessoa::class." pessoa       
@@ -49,7 +50,8 @@ class PessoaSalvar implements RequestHandlerInterface {
         }
     }
 
-	private function verificaDuplicacaoDocumento($documento, $idInsituicao, $label, $idPessoa = null) {
+    private function verificaDuplicacaoDocumento($documento, $idInsituicao, $label, $idPessoa = null)
+    {
         $dql = 'SELECT 
             pessoa 
         FROM '.Pessoa::class." pessoa       
@@ -68,7 +70,8 @@ class PessoaSalvar implements RequestHandlerInterface {
         }
     }
 
-	private function verificaDuplicacaoIdentificacao($identificacao, $idInsituicao, $label, $idPessoa = null) {
+    private function verificaDuplicacaoIdentificacao($identificacao, $idInsituicao, $label, $idPessoa = null)
+    {
         $dql = 'SELECT 
             pessoa 
         FROM '.Pessoa::class." pessoa       
@@ -87,73 +90,74 @@ class PessoaSalvar implements RequestHandlerInterface {
         }
     }
 
-	public function handle(ServerRequestInterface $request): ResponseInterface {
-		$id = $this->requestGETInteger('id', $request);
-		$nome = $this->requestPOSTString('nome', $request);
-		$identificacao = $this->requestPOSTString('identificacao', $request);
-		$documento = $this->requestPOSTString('documento', $request);
-		try {
-			$this->userVerifyAdmin();
-			$idInstituicao = $this->getSessionUserIdInstituicao();
-			$labelIdentificacao = $this->getSessionUserLabelIdentificacaoPessoa();
-			$labelDocumento = $this->getSessionUserLabelDocumentoPessoa();
-			if (empty($nome)) {
-				throw new \Exception('Nome não informado.', 1);
-			}
-			if (empty($documento)) {
-				throw new \Exception($labelDocumento . ' não informado.', 1);
-			}
-			if (!empty($labelIdentificacao) and empty($identificacao)) {
-				throw new \Exception($labelIdentificacao . ' não informado.', 1);
-			}			
-			$this->verificaDuplicacaoNome($nome, $idInstituicao, $id);
-			$this->verificaDuplicacaoDocumento($documento, $idInstituicao, $labelDocumento, $id);
-			$this->verificaDuplicacaoIdentificacao($identificacao, $idInstituicao, $labelIdentificacao, $id);			
-			$flAlterar = (!is_null($id) && $id !== false);
-			if ($flAlterar) {
-				$pessoa = $this->repositorioDePessoas->findOneBy(['id' => $id]);
-				if (is_null($pessoa)) {
-					throw new \Exception('Não foi possível identificar a pessoa.', 1);
-				}
-				if ($pessoa->getInstituicao()->getId() != $idInstituicao) {
-					throw new \Exception('A pessoa selecionada não é da mesma instituição do usuário atual.', 1);
-				}
-				$emprestimo = $pessoa->getEmprestimo();
-				if (!is_null($emprestimo)) {
-					throw new \Exception('Não é permitido alterar uma pessoa que tem um empréstimo de chave.', 1);
-				}
-			} else {
-				$usuarioAtual = $this->getLoggedUser($this->entityManager);	
-				$pessoa = new Pessoa();
-				$pessoa->setInstituicao($usuarioAtual->getInstituicao());
-			}
-			$pessoa->setNome($nome);
-			$pessoa->setNrDocumento($documento);
-			$pessoa->setNrIdentificacao($identificacao);			
-			if ($flAlterar) { //alterar
-				$this->entityManager->merge($pessoa);
-				$this->defineFlashMessage('success', 'Pessoa alterada com sucesso.');
-			} else { //inserir
-				$this->entityManager->persist($pessoa);
-				$this->defineFlashMessage('success', 'Pessoa cadastrada com sucesso.');
-			}
-			$this->entityManager->flush();
-			$rota = '/pessoas';
-			$this->clearFlashData();
-		} catch (\Exception $e) {
-			$this->defineFlashData([
-				'id' => $id,
-				'nome' => $nome,
-				'documento' => $documento,
-				'identificacao' => $identificacao				
-			]);
-			if (!empty($id)) {
-				$rota = '/alterar-pessoa?id=' . $id;
-			} else {
-				$rota = '/nova-pessoa';
-			}
-			$this->defineFlashMessage('danger', $e->getMessage());
-		}
-		return new Response(302, ['Location' => $rota], null);
-	}
+    public function handle(ServerRequestInterface $request): ResponseInterface
+    {
+        $id = $this->requestGETInteger('id', $request);
+        $nome = $this->requestPOSTString('nome', $request);
+        $identificacao = $this->requestPOSTString('identificacao', $request);
+        $documento = $this->requestPOSTString('documento', $request);
+        try {
+            $this->userVerifyAdmin();
+            $idInstituicao = $this->getSessionUserIdInstituicao();
+            $labelIdentificacao = $this->getSessionUserLabelIdentificacaoPessoa();
+            $labelDocumento = $this->getSessionUserLabelDocumentoPessoa();
+            if (empty($nome)) {
+                throw new \Exception('Nome não informado.', 1);
+            }
+            if (empty($documento)) {
+                throw new \Exception($labelDocumento . ' não informado.', 1);
+            }
+            if (!empty($labelIdentificacao) and empty($identificacao)) {
+                throw new \Exception($labelIdentificacao . ' não informado.', 1);
+            }
+            $this->verificaDuplicacaoNome($nome, $idInstituicao, $id);
+            $this->verificaDuplicacaoDocumento($documento, $idInstituicao, $labelDocumento, $id);
+            $this->verificaDuplicacaoIdentificacao($identificacao, $idInstituicao, $labelIdentificacao, $id);
+            $flAlterar = (!is_null($id) && $id !== false);
+            if ($flAlterar) {
+                $pessoa = $this->entityManager->find(Pessoa::class, $id);
+                if (is_null($pessoa)) {
+                    throw new \Exception('Não foi possível identificar a pessoa.', 1);
+                }
+                if ($pessoa->getInstituicao()->getId() != $idInstituicao) {
+                    throw new \Exception('A pessoa selecionada não é da mesma instituição do usuário atual.', 1);
+                }
+                $emprestimo = $pessoa->getEmprestimo();
+                if (!is_null($emprestimo)) {
+                    throw new \Exception('Não é permitido alterar uma pessoa que tem um empréstimo de chave.', 1);
+                }
+            } else {
+                $usuarioAtual = $this->getLoggedUser($this->entityManager);
+                $pessoa = new Pessoa();
+                $pessoa->setInstituicao($usuarioAtual->getInstituicao());
+            }
+            $pessoa->setNome($nome);
+            $pessoa->setNrDocumento($documento);
+            $pessoa->setNrIdentificacao($identificacao);
+            if ($flAlterar) { //alterar
+                $this->entityManager->merge($pessoa);
+                $this->defineFlashMessage('success', 'Pessoa alterada com sucesso.');
+            } else { //inserir
+                $this->entityManager->persist($pessoa);
+                $this->defineFlashMessage('success', 'Pessoa cadastrada com sucesso.');
+            }
+            $this->entityManager->flush();
+            $rota = '/pessoas';
+            $this->clearFlashData();
+        } catch (\Exception $e) {
+            $this->defineFlashData([
+                'id' => $id,
+                'nome' => $nome,
+                'documento' => $documento,
+                'identificacao' => $identificacao
+            ]);
+            if (!empty($id)) {
+                $rota = '/alterar-pessoa?id=' . $id;
+            } else {
+                $rota = '/nova-pessoa';
+            }
+            $this->defineFlashMessage('danger', $e->getMessage());
+        }
+        return new Response(302, ['Location' => $rota], null);
+    }
 }

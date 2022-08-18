@@ -26,13 +26,11 @@ class ChaveSalvar  implements RequestHandlerInterface
     use SessionUserTrait;
 	use RequestTrait;
 
-    private $repositorioDePredios;
     private $entityManager;
 
     public function __construct(EntityManagerInterface $entityManager)
     {
         $this->entityManager = $entityManager;
-        $this->repositorioDePredios = $this->entityManager->getRepository(Predio::class);
     }
 
     private function verificaDuplicacaoNumero($numero, $idPredio, $idChave = null) {
@@ -71,7 +69,7 @@ class ChaveSalvar  implements RequestHandlerInterface
 			if (empty($idPredio)) {
                 throw new \Exception("Prédio não informado.", 1);
             }
-			$predio = $this->repositorioDePredios->findOneBy(['id' => $idPredio]);
+            $predio = $this->entityManager->find(Predio::class, $idPredio);
 			if (is_null($predio)) {
 				throw new \Exception("Não foi possível identificar o prédio.", 1);
 			}

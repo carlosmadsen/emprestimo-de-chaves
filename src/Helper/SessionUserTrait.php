@@ -54,8 +54,7 @@ trait SessionUserTrait
         if (empty($dadosUsuario)) {
             throw new \Exception("Não foi possível identificar o usuário atual.", 1);
         }
-        $repositorioUsuarios = $entityManager->getRepository(Usuario::class);
-        $usuario = $repositorioUsuarios->findOneBy(['id' => $dadosUsuario['id']]);
+        $usuario = $this->entityManager->find(Usuario::class, $dadosUsuario['id']);
 		if (is_null($usuario)) {
 			throw new \Exception("Não foi possível identificar o usuário atual.", 1);
 		}
