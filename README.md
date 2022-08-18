@@ -48,8 +48,7 @@ Em seguida reinicie o servidor web:
 php -S localhost:8080 -t public
 ```
 ## TODO:
-1. Nas na pesquisa direto por id usar o entityManager e não os repositórios.
-2. Arrumar filtro, quando limpa um campo e pesquisa ele não sai da sessão e volta preenchido.
-3. Criar app de empréstimo de chaves. 
-4. Criar app de histórico de empréstimos.
-5. Colocar paginação nas listagens.
+1. Criar app de empréstimo de chaves. 
+2. Criar app de histórico de empréstimos.
+3. Colocar paginação nas listagens.
+4. Arrumar html de rodapé e tela de login.
