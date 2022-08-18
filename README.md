@@ -12,7 +12,7 @@ composer install
 ```
 Criação do banco de dados sqlite (no windows).
 ```
-.\vendor\bin\doctrine.bat orm:schema-tool:create
+php .\commands\doctrine.php orm:schema-tool:create
 ```
 Para configurar a aplicação em outro servidor de banco de dados edite o arquivo "src\Infra\EntityManagerCreator.php".
 
@@ -41,7 +41,7 @@ Acesse no seu navegador o endereço http://localhost:8080/ e se identifique com 
 ## Dica:
 Se estiver rodando no windows e ocorrer um erro na aplicação, pare o servidor web e rode o seguinte comando na pasta do projeto: 
 ```
-.\vendor\bin\doctrine orm:generate-proxies
+php .\commands\doctrine.php orm:generate-proxies
 ```
 Em seguida reinicie o servidor web: 
 ```
