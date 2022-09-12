@@ -63,7 +63,11 @@ class PessoaListar implements RequestHandlerInterface
 				'titulo' => 'Pessoas',
 				'temPesquisa' => $temPesquisa,
 				'labelIdentificacao' => $this->getSessionUserLabelIdentificacaoPessoa(),
-				'labelDocumento' => $this->getSessionUserLabelDocumentoPessoa()
+				'labelDocumento' => $this->getSessionUserLabelDocumentoPessoa(),
+				'pessoas' => [],					
+				'nome' => '',
+				'identificacao' => '',
+				'documento' => ''
 			];
 			if ($temPesquisa) {
 				$this->defineFilterSesssion([
@@ -92,12 +96,10 @@ class PessoaListar implements RequestHandlerInterface
 					pessoa.nome ';
 				$query = $this->entityManager->createQuery($dql);
 				$pessoas = $query->getResult();
-				$dados = array_merge($dados, [
-					'pessoas' => $pessoas,					
-					'nome' => $nome,
-					'identificacao' => $identificacao,
-					'documento' => $documento
-				]);
+				$dados['pessoas'] = $pessoas;
+				$dados['nome'] = $nome;
+				$dados['identificacao'] = $identificacao;
+				$dados['documento'] = $documento;
 			}
 			else {
 				$this->clearFilterSession();

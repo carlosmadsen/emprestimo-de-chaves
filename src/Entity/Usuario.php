@@ -173,6 +173,17 @@ class Usuario
         return $this->predios;
     }
 
+    public function getPrediosAtivos()
+    {
+        $predios = new ArrayCollection();
+        foreach ($this->predios as $p) {
+            if ($p->estaAtivo()) {
+                $predios->add($p);
+            }
+        }
+        return $predios;
+    }
+
     public function removePredio(Predio $predio)
     {
         if ($this->predios->contains($predio)) {

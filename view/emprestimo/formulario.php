@@ -45,7 +45,7 @@
 		<?php endif; ?>
 
         <button class="btn btn-primary">Salvar</button>
-        <a href="/chaves" class="btn btn-secondary">
+        <a href="/emprestimos" class="btn btn-secondary">
             Voltar
         </a>
     </form>

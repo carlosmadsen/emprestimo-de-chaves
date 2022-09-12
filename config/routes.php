@@ -2,6 +2,7 @@
 
 use Emprestimo\Chaves\Controller\{
     EmprestimosListar,
+    EmprestimoFormulario,
     Deslogar,
     LoginFormulario,
     LoginRealizar,
@@ -30,6 +31,7 @@ use Emprestimo\Chaves\Controller\{
 $rotas = [
     '' => EmprestimosListar::class,
     '/emprestimos' => EmprestimosListar::class,
+    '/novo-emprestimo' => EmprestimoFormulario::class,
     '/logout' => Deslogar::class,
     '/login' => LoginFormulario::class,
     '/realiza-login' => LoginRealizar::class,

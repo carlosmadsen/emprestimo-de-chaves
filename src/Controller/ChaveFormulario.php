@@ -28,13 +28,11 @@ class ChaveFormulario implements RequestHandlerInterface
     use SessionUserTrait;
     use RequestTrait;
 
-    //private $repositorioDeChaves;
     private $entityManager;
 
     public function __construct(EntityManagerInterface $entityManager)
     {
         $this->entityManager = $entityManager;
-        //$this->repositorioDeChaves = $this->entityManager->getRepository(Chave::class);
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
