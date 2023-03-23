@@ -2,6 +2,7 @@
 
 namespace Emprestimo\Chaves\Entity;
 
+use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
@@ -16,19 +17,19 @@ class Emprestimo
      * @GeneratedValue
      * @Column(type="integer")
      */
-    private $id;
+    private int $id;
     /**
      * @OneToOne(targetEntity="Pessoa", inversedBy="emprestimo")
      */
-    private $pessoa;
+    private Pessoa $pessoa;
     /**
      * @OneToOne(targetEntity="Chave", inversedBy="emprestimo")
      */
-    private $chave;
+    private Chave $chave;
     /**
      * @ManyToOne(targetEntity="Usuario", inversedBy="emprestimos")
      */
-    private $usuario;
+    private Usuario $usuario;
     /**
      * @Column(type="datetime", 
      * name="dt_emprestimo", 
@@ -38,7 +39,7 @@ class Emprestimo
      * columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP"), 
      * options={"comment":"Data e hora em que esse empréstimo foi lançado."})
     */
-    private $dtEmprestimo;       
+    private DateTime $dtEmprestimo;       
 
     public function getId(): int
     {
@@ -80,12 +81,12 @@ class Emprestimo
         $this->usuario = $usuario;
     }
 
-    public function setDtEmprestimo(string $v): void
+    public function setDtEmprestimo(DateTime $v): void
     {
         $this->dtEmprestimo = $v;
     }
 
-    public function getDtEmprestimo(): string
+    public function getDtEmprestimo(): DateTime
     {
         return $this->dtEmprestimo;
     }   

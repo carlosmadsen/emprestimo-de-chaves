@@ -2,6 +2,8 @@
 
 namespace Emprestimo\Chaves\Controller;
 
+use Exception;
+
 use Emprestimo\Chaves\Entity\Usuario;
 
 use Emprestimo\Chaves\Infra\EntityManagerCreator;
@@ -38,21 +40,21 @@ class LoginRealizar implements RequestHandlerInterface
 			$senha = $this->requestPOSTString('senha', $request);
 					
 			if (is_null($login) || $login === false) {
-				throw new \Exception("Login ou senha inválido.", 1);
+				throw new Exception("Login ou senha inválido.", 1);
 			}
 
 			$usuario = $this->repositorioUsuarios->findOneBy(['login' => $login]);
 			if (is_null($usuario) or !$usuario->senhaEstaCorreta($senha)) {
-				throw new \Exception("Login ou senha inválido.", 1);
+				throw new Exception("Login ou senha inválido.", 1);
 			}
 			if (!$usuario->estaAtivo()) {
-				throw new \Exception("Este usuário não está mais ativo.", 1);
+				throw new Exception("Este usuário não está mais ativo.", 1);
 			}
 
 			$this->defineSessionUser($usuario);
 			return new Response(302, ['Location' => '/emprestimos'], null);
 		}
-		catch (\Exception $e) {
+		catch (Exception $e) {
        		$this->defineFlashMessage('danger', $e->getMessage());
 			return new Response(302, ['Location' => '/login'], null);
      	}

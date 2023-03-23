@@ -2,6 +2,8 @@
 
 namespace Emprestimo\Chaves\Controller;
 
+use Exception;
+
 use Emprestimo\Chaves\Entity\Usuario;
 
 use Emprestimo\Chaves\Infra\EntityManagerCreator;
@@ -47,7 +49,7 @@ class UsuarioListar implements RequestHandlerInterface
 		try { 
 			$usuarioAtual = $this->getLoggedUser($this->entityManager);
 			if (is_null($usuarioAtual)) {
-				throw new \Exception("Não foi possível identificar o usuário.", 1);
+				throw new Exception("Não foi possível identificar o usuário.", 1);
 			}
 			$instituicao = $usuarioAtual->getInstituicao();
 			$idInstituicao = $instituicao->getId();
@@ -59,7 +61,7 @@ class UsuarioListar implements RequestHandlerInterface
 			$temPesquisa = (!empty($login) or !empty($nome) or !empty($ativo) or !empty($administrador) or !empty($idPredio));
 			$this->userVerifyAdmin();		
 			if (empty($idInstituicao)) {
-				throw new \Exception("Não foi possível identificar a instituição do usuário atual.", 1);
+				throw new Exception("Não foi possível identificar a instituição do usuário atual.", 1);
 			}
 			if ($temPesquisa) {
 				$this->defineFilterSesssion([
@@ -120,7 +122,7 @@ class UsuarioListar implements RequestHandlerInterface
 			]);
 			return new Response(200, [], $html);
 		}
-		catch (\Exception $e) {
+		catch (Exception $e) {
 			$this->defineFlashMessage('danger', $e->getMessage());
 			return new Response(302, ['Location' => '/login'], null);
 		}

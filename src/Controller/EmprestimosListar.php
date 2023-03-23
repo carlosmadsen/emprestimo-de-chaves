@@ -2,9 +2,14 @@
 
 namespace Emprestimo\Chaves\Controller;
 
+use Exception;
+use DateTime;
+
 use Emprestimo\Chaves\Entity\Usuario;
 use Emprestimo\Chaves\Entity\Instituicao;
 use Emprestimo\Chaves\Entity\Predio;
+use Emprestimo\Chaves\Entity\Emprestimo;
+use Emprestimo\Chaves\Entity\Chave;
 
 use Emprestimo\Chaves\Infra\EntityManagerCreator;
 
@@ -38,7 +43,7 @@ class EmprestimosListar  implements RequestHandlerInterface
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface 
-    {
+    {           
         try {
             $this->clearFlashData();
             $this->defineSessionFilterKey('emprestimos');
@@ -47,6 +52,10 @@ class EmprestimosListar  implements RequestHandlerInterface
             if ($cleanFilterSession) {
                 $this->clearFilterSession();
             }
+            $idInstituicao = $this->getSessionUserIdInstituicao();
+            if (empty($idInstituicao)) {
+				throw new Exception('Não foi possível identificar a instituição do usuário atual.', 1);
+			}
             $usuario = $this->getLoggedUser($this->entityManager);
             $predios = $usuario->getPrediosAtivos();
             $nrPredios = count($predios);            
@@ -54,7 +63,7 @@ class EmprestimosListar  implements RequestHandlerInterface
             if (empty($idPredio) and ($nrPredios == 1)) {
                 $idPredio = $predios[0]->getId();
             }         
-            $temPesquisa = (!empty($idPredio) /*or !empty($numero) or !empty($ativo)*/);
+            $temPesquisa = (!empty($idPredio));
             if ($temPesquisa) {
                 $this->defineFilterSesssion([				
                     'predio' => $idPredio
@@ -63,16 +72,37 @@ class EmprestimosListar  implements RequestHandlerInterface
             else {
                 $this->clearFilterSession();
             }
+            $emprestimos = $this->getEmprestimos($idInstituicao, $idPredio);
             $html = $this->renderizaHtml('emprestimo/listar.php', [
                 'titulo' => 'Empréstimos: ',
                 'predios' => $predios,
 				'idPredio' => $idPredio,
-                'emprestimos' => [] 
+                'emprestimos' => $emprestimos 
             ]); 
             return new Response(200, [], $html);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
 			$this->defineFlashMessage('danger', $e->getMessage());
 			return new Response(302, ['Location' => '/login'], null);
 		}    
     }
+
+    private function getEmprestimos($idInstituicao, $idPredio) {
+		if (empty($idPredio)) {
+			return [];
+		}
+		$dql = 'SELECT 
+            emprestimo 
+        FROM ' . Emprestimo::class . ' emprestimo 
+        JOIN emprestimo.chave chave 		
+        JOIN chave.predio predio
+        JOIN predio.instituicao instituicao		 		
+        WHERE 
+            predio.id = '.$idPredio.' AND 
+            instituicao.id = ' . $idInstituicao . ' 		
+        ORDER BY 
+            chave.numero ';
+		$query = $this->entityManager->createQuery($dql);
+		return $query->getResult();
+	}
+
 }

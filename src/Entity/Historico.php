@@ -2,6 +2,7 @@
 
 namespace Emprestimo\Chaves\Entity;
 
+use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
@@ -33,23 +34,23 @@ class Historico
      */
     private $nomeUsuarioEmprestimo;
 	/**
-     * @Column(type="string", name="login_usuario_devolucao", unique=false, length=255, nullable=false, options={"comment":"Login do usuário que lançou a devolução."})
+     * @Column(type="string", name="login_usuario_devolucao", unique=false, length=255, nullable=true, options={"comment":"Login do usuário que lançou a devolução."})
     */    
 	private $loginUsuarioDevolucao;
 	/**
-     * @Column(type="string", name="nome_usuario_devolucao", unique=false, length=255, nullable=false, options={"comment":"Nome do usuário que lançou a devolução."})
+     * @Column(type="string", name="nome_usuario_devolucao", unique=false, length=255, nullable=true, options={"comment":"Nome do usuário que lançou a devolução."})
     */    
 	private $nomeUsuarioDevolucao;
 	/**
      * @Column(type="datetime", name="dt_emprestimo", unique=false, length=20, nullable=false, columnDefinition="TIMESTAMP"), options={"comment":"Data e hora em o empréstimo foi lançado."})
     */
-    private $dtEmprestimo; 
+    private DateTime $dtEmprestimo; 
 	/**
      * @Column(type="datetime", name="dt_devolucao", unique=false, length=20, nullable=false, columnDefinition="TIMESTAMP"), options={"comment":"Data e hora em a devolução foi lançada."})
     */
-    private $dtDevolucao; 
+    private DateTime $dtDevolucao; 
 	/**
-     * @Column(type="string", name="nome_pessoa", unique=false, length=255, nullable=false, options={"comment":"Nome da pessoa que pegou a chave emprestada."})
+     * @Column(type="string", name="nome_pessoa", unique=false, length=255, nullable=true, options={"comment":"Nome da pessoa que pegou a chave emprestada."})
     */ 
 	private $nomePessoa;
 	/**
@@ -121,22 +122,22 @@ class Historico
         return $this->nomeUsuarioDevolucao;
     }
 
-	public function setDtEmprestimo(string $v): void
+	public function setDtEmprestimo(DateTime $v): void
     {
         $this->dtEmprestimo = $v;
     }
 
-    public function getDtEmprestimo(): string
+    public function getDtEmprestimo(): DateTime
     {
         return $this->dtEmprestimo;
     }   
 
-	public function setDtDevolucao(string $v): void
+	public function setDtDevolucao(DateTime $v): void
     {
         $this->dtDevolucao = $v;
     }
 
-    public function getDtDevolucao(): string
+    public function getDtDevolucao(): DateTime
     {
         return $this->dtDevolucao;
     } 

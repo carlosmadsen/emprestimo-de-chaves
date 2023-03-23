@@ -2,6 +2,8 @@
 
 namespace Emprestimo\Chaves\Controller;
 
+use Exception;
+
 use Emprestimo\Chaves\Entity\Chave;
 use Emprestimo\Chaves\Entity\Predio;
 use Emprestimo\Chaves\Entity\Instituicao;
@@ -48,11 +50,11 @@ class ChaveFormulario implements RequestHandlerInterface
             if (empty($dados) and !empty($id)) {
                 $chave = $this->entityManager->find(Chave::class, $id);
                 if (is_null($chave)) {
-                    throw new \Exception("Não foi possível identificar a chave.", 1);
+                    throw new Exception("Não foi possível identificar a chave.", 1);
                 }
                 $predio = $chave->getPredio();
                 if ($predio->getInstituicao()->getId() != $idInstituicao) {
-                    throw new \Exception("O prédio selecionado não é da mesma instituição do usuário atual.", 1);
+                    throw new Exception("O prédio selecionado não é da mesma instituição do usuário atual.", 1);
                 }
                 $dados = [
                     'id' => $id,
@@ -68,7 +70,7 @@ class ChaveFormulario implements RequestHandlerInterface
                 'titulo' => $titulo
             ], $dados));
             return new Response(200, [], $html);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->defineFlashMessage('danger', $e->getMessage());
             return new Response(302, ['Location' => '/chaves'], null);
         }

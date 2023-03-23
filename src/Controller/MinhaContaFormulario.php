@@ -2,6 +2,8 @@
 
 namespace Emprestimo\Chaves\Controller;
 
+use Exception;
+
 use Emprestimo\Chaves\Entity\Usuario;
 use Emprestimo\Chaves\Entity\Instituicao;
 
@@ -33,14 +35,14 @@ class MinhaContaFormulario implements RequestHandlerInterface
         $this->clearFlashData();
         try {    
 			if (empty($dadosUsuario)) {
-				throw new \Exception('Não foi possível identificar o usuário atual.', 1);
+				throw new Exception('Não foi possível identificar o usuário atual.', 1);
 			}
 			$html = $this->renderizaHtml('minha_conta/formulario.php', array_merge([
           	  'titulo' => 'Minha conta'
             ], $dados));
             return new Response(200, [], $html);
 		}
-		catch (\Exception $e) {
+		catch (Exception $e) {
 			$this->defineFlashMessage('danger', $e->getMessage());
 			return new Response(302, ['Location' => '/login'], null);
 		}

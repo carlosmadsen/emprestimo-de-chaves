@@ -6,11 +6,8 @@ require __DIR__ . '/../inicio-html.php'; ?>
 	<a href="/novo-emprestimo" class="btn btn-primary mb-2">
 		Novo empréstimo
 	</a>
-
 	<form  action="/emprestimos?filtrar=1" method="post" >
-
 	<div class="form-row">
-
 	
 		<div class="form-group col-md-2 ">
 		<label for="predio">Prédio</label>
@@ -44,29 +41,26 @@ require __DIR__ . '/../inicio-html.php'; ?>
 			<table class="table  table-bordered">
 			<thead >
 				<tr>
-				<th scope="col">Número</th>
-				<th scope="col">Descrição</th>
-				<th scope="col">Ativo</th>
-				<th scope="col">Operações</th>
+					<th scope="col">Nº Chave</th>
+					<th scope="col">Nome</th>
+					<th scope="col">Data e Hora</th>
+					<th scope="col">Operações</th>
 				</tr>
 			</thead>
 			<tbody>
 				
-				<?php foreach ($emprestimos as $emprestimo): ?>
+			<?php foreach ($emprestimos as $emprestimo): ?>
 				<tr>
-				<td><?= $chave->getNumero(); ?></td>
-				<td><?= $chave->getDescricao(); ?></td>
-				<td style="text-align:center;" ><?= ($chave->estaAtivo() ? 'Sim' : 'Não'); ?></td> 
-				<td style="text-align:center;" >   
-						<a href="/alterar-chave?id=<?= $chave->getId(); ?>" class="btn btn-info btn-sm">
-							Alterar
-						</a>
-						<a href="/remover-chave?id=<?= $chave->getId(); ?>" class="btn btn-danger btn-sm">
-							Remover
+					<td><?= $emprestimo->getChave()->getNumero(); ?></td>
+					<td><?= $emprestimo->getPessoa()->getNome(); ?></td>
+					<td style="text-align:center;" ><?=  $emprestimo->getDtEmprestimo()->format('d/m/Y H:i:s'); ?></td> 
+					<td style="text-align:center;" > 				
+						<a href="/devolver?id=<?= $emprestimo->getId(); ?>" class="btn btn-danger btn-sm">
+							Devolver
 						</a>        
-				</td>
+					</td>
 				</tr>
-				<?php endforeach; ?>    
+			<?php endforeach; ?>    
 
 			</tbody>
 			</table>
@@ -89,11 +83,9 @@ require __DIR__ . '/../inicio-html.php'; ?>
 
 
 <?php else: ?>
-
 	<div class="alert alert-info">
 	Seu usuário não está relacionado a nenhum prédio ativo.
 	</div>
-
 <?php endif; ?>
 
 <?php

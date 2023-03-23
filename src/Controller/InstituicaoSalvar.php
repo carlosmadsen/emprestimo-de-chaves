@@ -2,6 +2,8 @@
 
 namespace Emprestimo\Chaves\Controller;
 
+use Exception;
+
 use Emprestimo\Chaves\Entity\Usuario;
 use Emprestimo\Chaves\Entity\Instituicao;
 
@@ -43,7 +45,7 @@ class InstituicaoSalvar  implements RequestHandlerInterface
         $query = $this->entityManager->createQuery($dql);
         $instituicoes = $query->getResult();
         if (count($instituicoes)>0) {
-            throw new \Exception('A sigla "'.$sigla.'" já está sendo utilizado pela instituição "'.$instituicoes[0]->getNome().'".', 1);
+            throw new Exception('A sigla "'.$sigla.'" já está sendo utilizado pela instituição "'.$instituicoes[0]->getNome().'".', 1);
         }
     }
 
@@ -59,7 +61,7 @@ class InstituicaoSalvar  implements RequestHandlerInterface
         $query = $this->entityManager->createQuery($dql);
         $instituicoes = $query->getResult();
         if (count($instituicoes)>0) {
-            throw new \Exception('O nome "'.$nome.'" já está sendo utilizado pela instituição de sigla "'.$instituicoes[0]->getSigla().'".', 1);
+            throw new Exception('O nome "'.$nome.'" já está sendo utilizado pela instituição de sigla "'.$instituicoes[0]->getSigla().'".', 1);
         }
     }
 
@@ -69,11 +71,11 @@ class InstituicaoSalvar  implements RequestHandlerInterface
 			$this->userVerifyAdmin();
 			$sigla = $this->requestPOSTString('sigla', $request);
 			if (empty($sigla)) {
-				throw new \Exception("Sigla não informada.", 1);
+				throw new Exception("Sigla não informada.", 1);
 			}
 			$nome = $this->requestPOSTString('nome', $request);
 			if (empty($nome)) {
-				throw new \Exception("Nome não informado.", 1);
+				throw new Exception("Nome não informado.", 1);
 			}
             $identificacao = $this->requestPOSTString('identificacao', $request);
 			if (empty($identificacao)) {
@@ -81,7 +83,7 @@ class InstituicaoSalvar  implements RequestHandlerInterface
 			}
             $documento = $this->requestPOSTString('documento', $request);
 			if (empty($documento)) {
-				throw new \Exception("Label do número de documento não informado.", 1);
+				throw new Exception("Label do número de documento não informado.", 1);
 			}
 
 			$usuario = $this->getLoggedUser($this->entityManager);
@@ -99,7 +101,7 @@ class InstituicaoSalvar  implements RequestHandlerInterface
 			$this->defineFlashMessage('success', 'Informações da instituição atualizadas com sucesso.');
 			$this->defineSessionUser($usuario);
 		}
-		catch (\Exception $e) {
+		catch (Exception $e) {
 			$this->defineFlashMessage('danger', $e->getMessage());
 		}
 		return new Response(302, ['Location' => '/instituicao'], null);

@@ -2,6 +2,8 @@
 
 namespace Emprestimo\Chaves\Controller;
 
+use Exception;
+
 use Emprestimo\Chaves\Entity\Usuario;
 use Emprestimo\Chaves\Entity\Instituicao;
 
@@ -47,7 +49,7 @@ class MinhaContaSalvar  implements RequestHandlerInterface
         $query = $this->entityManager->createQuery($dql);
         $usuarios = $query->getResult();
         if (count($usuarios)>0) {
-            throw new \Exception('O login "'.$usuarios[0]->getLogin().'" já está sendo utilizado pelo usuário "'.$usuarios[0]->getNome().'".', 1);
+            throw new Exception('O login "'.$usuarios[0]->getLogin().'" já está sendo utilizado pelo usuário "'.$usuarios[0]->getNome().'".', 1);
         }
     }   
 
@@ -65,31 +67,31 @@ class MinhaContaSalvar  implements RequestHandlerInterface
         $novaSenha2 = $this->requestPOSTString('nova_senha2', $request);    
 		try {
             if (empty($dadosUsuario)) {
-				throw new \Exception('Não foi possível identificar o usuário atual.', 1);
+				throw new Exception('Não foi possível identificar o usuário atual.', 1);
 			}
             if (empty($login)) {
-                throw new \Exception("Login não informado.", 1);
+                throw new Exception("Login não informado.", 1);
             }
 		    if (empty($nome)) {
-                throw new \Exception("Nome não informado.", 1);
+                throw new Exception("Nome não informado.", 1);
             }
 		    if (empty($email)) {
-                throw new \Exception("E-mail não informado.", 1);
+                throw new Exception("E-mail não informado.", 1);
             }
             if (empty($senhaAtual)) {
-                throw new \Exception("Senha atual não informada.", 1);
+                throw new Exception("Senha atual não informada.", 1);
             }
             $this->verificaDuplicacaoLogin($login, $idInstituicao, $id);
             $usuario = $this->getLoggedUser($this->entityManager);
             if (!$usuario->senhaEstaCorreta($senhaAtual)) {
-				throw new \Exception("Senha atual inválida.", 1);
+				throw new Exception("Senha atual inválida.", 1);
 			}
             if ($alterarSenha) {
                 if (empty($novaSenha1) or empty($novaSenha2)) {
-                    throw new \Exception("Uma das novas senhas não foi informada.", 1);
+                    throw new Exception("Uma das novas senhas não foi informada.", 1);
                 }
                 if ($novaSenha1 != $novaSenha2) {
-                    throw new \Exception("As novas senhas não conferem.", 1);
+                    throw new Exception("As novas senhas não conferem.", 1);
                 }
                 $usuario->setSenha($novaSenha1);
             }
@@ -103,7 +105,7 @@ class MinhaContaSalvar  implements RequestHandlerInterface
             $this->clearFlashData();
             $this->defineFlashMessage('success', 'Conta atualizada com sucesso.');            
 		}
-		catch (\Exception $e) {
+		catch (Exception $e) {
             $this->defineFlashData([
                 'login' => $login,
                 'nome' => $nome,

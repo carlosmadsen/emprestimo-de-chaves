@@ -2,6 +2,8 @@
 
 namespace Emprestimo\Chaves\Controller;
 
+use Exception;
+
 use Emprestimo\Chaves\Entity\Usuario;
 use Emprestimo\Chaves\Entity\Instituicao;
 
@@ -45,7 +47,7 @@ class InstituicaoFormulario  implements RequestHandlerInterface
 			]); 
 			return new Response(200, [], $html);
 		}
-		catch (\Exception $e) {
+		catch (Exception $e) {
 			$this->defineFlashMessage('danger', $e->getMessage());
 			return new Response(302, ['Location' => '/login'], null);
 		}

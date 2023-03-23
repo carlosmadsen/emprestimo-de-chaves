@@ -2,6 +2,8 @@
 
 namespace Emprestimo\Chaves\Controller;
 
+use Exception;
+
 use Emprestimo\Chaves\Entity\Pessoa;
 use Emprestimo\Chaves\Entity\Instituicao;
 use Emprestimo\Chaves\Entity\Emprestimo;
@@ -46,9 +48,9 @@ class PessoaSalvar implements RequestHandlerInterface
         $query = $this->entityManager->createQuery($dql);
         $usuarios = $query->getResult();
         if (count($usuarios)>0) {
-            throw new \Exception('Já existe outra pessoa cadastrada com esse nome.', 1);
+            throw new Exception('Já existe outra pessoa cadastrada com esse nome.', 1);
         }
-    }
+    }    
 
     private function verificaDuplicacaoDocumento($documento, $idInsituicao, $label, $idPessoa = null)
     {
@@ -66,7 +68,7 @@ class PessoaSalvar implements RequestHandlerInterface
         $query = $this->entityManager->createQuery($dql);
         $usuarios = $query->getResult();
         if (count($usuarios)>0) {
-            throw new \Exception('Já existe outra pessoa cadastrada com esse '.strtolower($label).'.', 1);
+            throw new Exception('Já existe outra pessoa cadastrada com esse '.strtolower($label).'.', 1);
         }
     }
 
@@ -86,7 +88,7 @@ class PessoaSalvar implements RequestHandlerInterface
         $query = $this->entityManager->createQuery($dql);
         $usuarios = $query->getResult();
         if (count($usuarios)>0) {
-            throw new \Exception('Já existe outra pessoa cadastrada com esse '.strtolower($label).'.', 1);
+            throw new Exception('Já existe outra pessoa cadastrada com esse '.strtolower($label).'.', 1);
         }
     }
 
@@ -102,13 +104,13 @@ class PessoaSalvar implements RequestHandlerInterface
             $labelIdentificacao = $this->getSessionUserLabelIdentificacaoPessoa();
             $labelDocumento = $this->getSessionUserLabelDocumentoPessoa();
             if (empty($nome)) {
-                throw new \Exception('Nome não informado.', 1);
+                throw new Exception('Nome não informado.', 1);
             }
             if (empty($documento)) {
-                throw new \Exception($labelDocumento . ' não informado.', 1);
+                throw new Exception($labelDocumento . ' não informado.', 1);
             }
             if (!empty($labelIdentificacao) and empty($identificacao)) {
-                throw new \Exception($labelIdentificacao . ' não informado.', 1);
+                throw new Exception($labelIdentificacao . ' não informado.', 1);
             }
             $this->verificaDuplicacaoNome($nome, $idInstituicao, $id);
             $this->verificaDuplicacaoDocumento($documento, $idInstituicao, $labelDocumento, $id);
@@ -117,14 +119,14 @@ class PessoaSalvar implements RequestHandlerInterface
             if ($flAlterar) {
                 $pessoa = $this->entityManager->find(Pessoa::class, $id);
                 if (is_null($pessoa)) {
-                    throw new \Exception('Não foi possível identificar a pessoa.', 1);
+                    throw new Exception('Não foi possível identificar a pessoa.', 1);
                 }
                 if ($pessoa->getInstituicao()->getId() != $idInstituicao) {
-                    throw new \Exception('A pessoa selecionada não é da mesma instituição do usuário atual.', 1);
+                    throw new Exception('A pessoa selecionada não é da mesma instituição do usuário atual.', 1);
                 }
                 $emprestimo = $pessoa->getEmprestimo();
                 if (!is_null($emprestimo)) {
-                    throw new \Exception('Não é permitido alterar uma pessoa que tem um empréstimo de chave.', 1);
+                    throw new Exception('Não é permitido alterar uma pessoa que tem um empréstimo de chave.', 1);
                 }
             } else {
                 $usuarioAtual = $this->getLoggedUser($this->entityManager);
@@ -144,7 +146,7 @@ class PessoaSalvar implements RequestHandlerInterface
             $this->entityManager->flush();
             $rota = '/pessoas';
             $this->clearFlashData();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->defineFlashData([
                 'id' => $id,
                 'nome' => $nome,

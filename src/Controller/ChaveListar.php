@@ -2,6 +2,8 @@
 
 namespace Emprestimo\Chaves\Controller;
 
+use Exception;
+
 use Emprestimo\Chaves\Entity\Predio;
 use Emprestimo\Chaves\Entity\Chave;
 
@@ -61,7 +63,7 @@ class ChaveListar implements RequestHandlerInterface {
 		try {
 			$this->userVerifyAdmin();
 			if (empty($idInstituicao)) {
-				throw new \Exception('Não foi possível identificar a instituição do usuário atual.', 1);
+				throw new Exception('Não foi possível identificar a instituição do usuário atual.', 1);
 			}
 			$predios = $this->getPredios($idInstituicao);
 			$chaves = $this->getChaves($idInstituicao, $idPredio, $numero, $descricao, $ativo);
@@ -76,7 +78,7 @@ class ChaveListar implements RequestHandlerInterface {
 				'temPesquisa' => $temPesquisa,
 			]);
 			return new Response(200, [], $html);
-		} catch (\Exception $e) {
+		} catch (Exception $e) {
 			$this->defineFlashMessage('danger', $e->getMessage());
 			return new Response(302, ['Location' => '/login'], null);
 		}

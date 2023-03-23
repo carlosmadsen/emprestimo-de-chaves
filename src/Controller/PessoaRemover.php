@@ -2,6 +2,8 @@
 
 namespace Emprestimo\Chaves\Controller;
 
+use Exception;
+
 use Emprestimo\Chaves\Entity\Pessoa;
 use Emprestimo\Chaves\Entity\Emrpestimo;
 use Emprestimo\Chaves\Entity\Instituicao;
@@ -37,24 +39,27 @@ class PessoaRemover implements RequestHandlerInterface
 			$this->userVerifyAdmin();
 			$id = $this->requestGETInteger('id', $request);
 			if (is_null($id) || $id === false) {
-				throw new \Exception("Identificação de pessoa inválida.", 1);
+				throw new Exception("Identificação de pessoa inválida.", 1);
 			}
 			if (empty($idInstituicao)) {
-				throw new \Exception("Não foi possível identificar a instituição do usuário atual.", 1);
+				throw new Exception("Não foi possível identificar a instituição do usuário atual.", 1);
 			}
 			$pessoa = $this->entityManager->find(Pessoa::class, $id);
+			if (is_null($pessoa)) {
+				throw new Exception("Não foi possível localizar a pessoa.", 1);	
+			}
  			if ($pessoa->getInstituicao()->getId() != $idInstituicao) {
-				throw new \Exception("A pessoa selecionada não é da mesma instituição do usuário atual.", 1);
+				throw new Exception("A pessoa selecionada não é da mesma instituição do usuário atual.", 1);
             }
 			$emprestimo = $pessoa->getEmprestimo();
 			if (!is_null($emprestimo)) {
-				throw new \Exception('Não é permitido remover uma pessoa que tem um empréstimo de chave.', 1);
+				throw new Exception('Não é permitido remover uma pessoa que tem um empréstimo de chave.', 1);
 			}
 			$this->entityManager->remove($pessoa);
 			$this->entityManager->flush();
 			$this->defineFlashMessage('success', 'Pessoa removida com sucesso.');
 		}
-		catch (\Exception $e) {
+		catch (Exception $e) {
 			$this->defineFlashMessage('danger', $e->getMessage());
 		}
 		return new Response(302, ['Location' => '/pessoas'], null);

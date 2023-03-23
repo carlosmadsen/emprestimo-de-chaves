@@ -2,8 +2,12 @@
 
 namespace Emprestimo\Chaves\Controller;
 
+use Exception;
+
 use Emprestimo\Chaves\Entity\Predio;
 use Emprestimo\Chaves\Entity\Instituicao;
+use Emprestimo\Chaves\Entity\Emprestimo;
+use Emprestimo\Chaves\Entity\Chave;
 
 use Emprestimo\Chaves\Infra\EntityManagerCreator;
 
@@ -47,9 +51,26 @@ class PredioSalvar implements RequestHandlerInterface
         $query = $this->entityManager->createQuery($dql);
         $predios = $query->getResult();
         if (count($predios)>0) {
-            throw new \Exception('Já existe um prédio cadastrado com o nome "'.$predios[0]->getNome().'".', 1);
+            throw new Exception('Já existe um prédio cadastrado com o nome "'.$predios[0]->getNome().'".', 1);
         }
     }
+
+    private function verificaEmprestimosEmAberto(Predio $predio): void
+    {       
+        $dql = 'SELECT 
+            COUNT(emprestimo.id) 
+        FROM  '. Emprestimo::class . ' emprestimo
+        JOIN emprestimo.chave chave 
+        JOIN chave.predio predio
+        WHERE
+            predio.id =  '.$predio->getId().'
+        ';
+        $query = $this->entityManager->createQuery($dql);
+        $nrEmprestimos = $query->getSingleScalarResult();
+        if ($nrEmprestimos > 0) {
+            throw new Exception('Não é permitido modificar um prédio que tem empréstimos de chave em aberto.');
+        }
+    } 
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
@@ -62,11 +83,11 @@ class PredioSalvar implements RequestHandlerInterface
         try {
             $this->userVerifyAdmin();
             if (empty($nome)) {
-                throw new \Exception("Nome não informado.", 1);
+                throw new Exception("Nome não informado.", 1);
             }
             $usuarioAtual = $this->getLoggedUser($this->entityManager);
             if (is_null($usuarioAtual)) {
-                throw new \Exception("Não foi possível identificar o usuário.", 1);
+                throw new Exception("Não foi possível identificar o usuário.", 1);
             }
             $instituicao = $usuarioAtual->getInstituicao();
             $this->verificaDuplicacaoNome($nome, $instituicao->getId(), $id);
@@ -76,7 +97,8 @@ class PredioSalvar implements RequestHandlerInterface
             $predio->setAtivo($ativo == 'S');
             if (!is_null($id) && $id !== false) { //atualizar
                 $predio->setId($id);
-                $this->entityManager->merge($predio);
+                $this->verificaEmprestimosEmAberto($predio);
+                 $this->entityManager->merge($predio);
                 $this->defineFlashMessage('success', 'Prédio alterado com sucesso.');
             } else { //inserir
                 $this->entityManager->persist($predio);
@@ -85,7 +107,7 @@ class PredioSalvar implements RequestHandlerInterface
             $this->entityManager->flush();
             $rota = '/predios';
             $this->clearFlashData();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->defineFlashData([
                 'id' => $id,
                 'nome' => $nome,

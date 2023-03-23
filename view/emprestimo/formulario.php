@@ -1,6 +1,6 @@
 <?php include __DIR__ . '/../inicio-html.php'; ?>
 
-    <form action="/salvar-chave<?= isset($id) ? '?id=' . $id : ''; ?>" method="post" >
+    <form action="/emprestar" method="post" >
         
 		<div class="form-group">
             <label for="nome">Prédio</label>
@@ -13,36 +13,39 @@
         </div> 
 
 		<div class="form-group">
-            <label for="nome">Número</label>
+            <label for="numero_chave">Número da Chave</label>
             <input type="text" 
-                id="numero" 
-                name="numero" 
+                id="numero_chave" 
+                name="numero_chave" 
                 class="form-control"
 				required="required"
-                value="<?= isset($numero) ? $numero : ''; ?>"
+                value="<?= isset($numeroChave) ? $numeroChave : ''; ?>"
             >
         </div> 
 		
+		<?php if (!empty($labelIdentificacao) > 0) : ?>
 		<div class="form-group">
-            <label for="nome">Descrição</label>
+            <label for="identificacao"><?= $labelIdentificacao ?></label>
             <input type="text" 
-                id="descricao" 
-                name="descricao" 
+                id="identificacao" 
+                name="identificacao" 
                 class="form-control"
-	            value="<?= isset($descricao) ? $descricao : ''; ?>"
+				required="required"
+                value="<?= isset($identificacao) ? $identificacao : ''; ?>"
             >
         </div> 
-
-		<?php if (isset($id)) : ?>
-		<div class="form-group">
-            <label for="ativo">Ativo</label>
-            <select class="form-control" id="ativo" name="ativo" required="required" >
-				<option></option>
-				<option <?= ((isset($ativo) and $ativo=='S') ? 'selected' : ''); ?> value='S' >Sim</option>
-				<option <?= ((isset($ativo) and $ativo=='N') ? 'selected' : ''); ?> value='N' >Não</option>
-			</select>
-        </div> 
 		<?php endif; ?>
+
+		<div class="form-group">
+            <label for="documento"><?= $labelDocumento ?></label>
+            <input type="text" 
+                id="documento" 
+                name="documento" 
+                class="form-control"
+				required="required"
+                value="<?= isset($documento) ? $documento : ''; ?>"
+            >
+        </div> 		
 
         <button class="btn btn-primary">Salvar</button>
         <a href="/emprestimos" class="btn btn-secondary">

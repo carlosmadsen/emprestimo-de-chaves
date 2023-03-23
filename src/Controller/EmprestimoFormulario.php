@@ -39,12 +39,12 @@ class EmprestimoFormulario implements RequestHandlerInterface
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {       
-        $dados = $this->getFlashData();
+        $dados = $this->getFlashData();       
         $this->clearFlashData();
 		$this->defineSessionFilterKey('emprestimos');
         try {
-            $usuario = $this->getLoggedUser($this->entityManager);       
-            $predios = $usuario->getPrediosAtivos();
+            $usuarioAtual = $this->getLoggedUser($this->entityManager);    
+            $predios = $usuarioAtual->getPrediosAtivos();
 			$idPredio = $this->getFilterSession('predio');
 			if (empty($idPredio) and (count($predios) == 1)) {
                 $idPredio = $predios[0]->getId();
@@ -52,7 +52,9 @@ class EmprestimoFormulario implements RequestHandlerInterface
             $html = $this->renderizaHtml('emprestimo/formulario.php', array_merge([
                 'titulo' => 'Novo empréstimo',
 				'predios' => $predios,
-				'idPredio' => $idPredio
+				'idPredio' => $idPredio,
+                'labelIdentificacao' => $this->getSessionUserLabelIdentificacaoPessoa(),
+                'labelDocumento' => $this->getSessionUserLabelDocumentoPessoa()
             ], $dados));
             return new Response(200, [], $html);
         } catch (\Exception $e) {

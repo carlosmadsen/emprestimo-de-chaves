@@ -2,6 +2,8 @@
 
 namespace Emprestimo\Chaves\Controller;
 
+use Exception;
+
 use Emprestimo\Chaves\Entity\Usuario;
 use Emprestimo\Chaves\Entity\Instituicao;
 
@@ -48,17 +50,17 @@ class UsuarioFormulario implements RequestHandlerInterface
             $this->userVerifyAdmin();
             $usuarioAtual = $this->getLoggedUser($this->entityManager);
             if (is_null($usuarioAtual)) {
-                throw new \Exception("Não foi possível identificar o usuário.", 1);
+                throw new Exception("Não foi possível identificar o usuário.", 1);
             }
             $instituicao = $usuarioAtual->getInstituicao();
             $prediosSelecionados = [];
             if (empty($dados) and !empty($id)) {
                 $usuario = $this->entityManager->find(Usuario::class, $id);
                 if (is_null($usuario)) {
-                    throw new \Exception("Não foi possível identificar o usuário.", 1);
+                    throw new Exception("Não foi possível identificar o usuário.", 1);
                 }
                 if ($usuario->getInstituicao()->getId() != $instituicao->getId()) {
-                    throw new \Exception("O usuário selecionado não é da mesma instituição do usuário atual.", 1);
+                    throw new Exception("O usuário selecionado não é da mesma instituição do usuário atual.", 1);
                 }
                 $prediosUsuario = $usuario->getPredios();
                 foreach ($prediosUsuario as $predio) {
@@ -87,7 +89,7 @@ class UsuarioFormulario implements RequestHandlerInterface
                 'titulo' => $titulo
             ], $dados));
             return new Response(200, [], $html);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->defineFlashMessage('danger', $e->getMessage());
             return new Response(302, ['Location' => '/usuarios'], null);
         }

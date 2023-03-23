@@ -2,8 +2,11 @@
 
 namespace Emprestimo\Chaves\Controller;
 
+use Exception;
+
 use Emprestimo\Chaves\Entity\Usuario;
 use Emprestimo\Chaves\Entity\Instituicao;
+use Emprestimo\Chaves\Entity\Emprestimo;
 
 use Emprestimo\Chaves\Infra\EntityManagerCreator;
 
@@ -45,7 +48,7 @@ class UsuarioSalvar implements RequestHandlerInterface
         $query = $this->entityManager->createQuery($dql);
         $usuarios = $query->getResult();
         if (count($usuarios)>0) {
-            throw new \Exception('O login "'.$usuarios[0]->getLogin().'" já está sendo utilizado pelo usuário "'.$usuarios[0]->getNome().'".', 1);
+            throw new Exception('O login "'.$usuarios[0]->getLogin().'" já está sendo utilizado pelo usuário "'.$usuarios[0]->getNome().'".', 1);
         }
     }
 
@@ -62,7 +65,7 @@ class UsuarioSalvar implements RequestHandlerInterface
         $query = $this->entityManager->createQuery($dql);
         $usuarios = $query->getResult();
         if (count($usuarios)<1) {
-            throw new \Exception('Não é permitido remover o último usuário administrativo.', 1);
+            throw new Exception('Não é permitido remover o último usuário administrativo.', 1);
         }
     }
 
@@ -79,9 +82,9 @@ class UsuarioSalvar implements RequestHandlerInterface
         $query = $this->entityManager->createQuery($dql);
         $usuarios = $query->getResult();
         if (count($usuarios)<1) {
-            throw new \Exception('Não é permitido remover o último usuário ativo.', 1);
+            throw new Exception('Não é permitido remover o último usuário ativo.', 1);
         }
-    }
+    }   
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
@@ -103,17 +106,17 @@ class UsuarioSalvar implements RequestHandlerInterface
         try {
             $this->userVerifyAdmin();
             if (empty($login)) {
-                throw new \Exception("Login não informado.", 1);
+                throw new Exception("Login não informado.", 1);
             }
             if (empty($nome)) {
-                throw new \Exception("Nome não informado.", 1);
+                throw new Exception("Nome não informado.", 1);
             }
             if (empty($email)) {
-                throw new \Exception("E-mail não informado.", 1);
+                throw new Exception("E-mail não informado.", 1);
             }
             $usuarioAtual = $this->getLoggedUser($this->entityManager);
             if (is_null($usuarioAtual)) {
-                throw new \Exception("Não foi possível identificar o usuário.", 1);
+                throw new Exception("Não foi possível identificar o usuário.", 1);
             }
             $this->verificaDuplicacaoLogin($login, $id);
             $instituicao = $usuarioAtual->getInstituicao();
@@ -121,11 +124,15 @@ class UsuarioSalvar implements RequestHandlerInterface
             if ($flAlterar) {
                 $usuario = $this->entityManager->find(Usuario::class, $id);
                 if (is_null($usuario)) {
-                    throw new \Exception("Não foi possível identificar o usuário.", 1);
+                    throw new Exception("Não foi possível identificar o usuário.", 1);
                 }
                 if ($usuario->getInstituicao()->getId() != $instituicao->getId()) {
-                    throw new \Exception("O usuário selecionado não é da mesma instituição do usuário atual.", 1);
+                    throw new Exception("O usuário selecionado não é da mesma instituição do usuário atual.", 1);
                 }
+                $emprestimos = $usuario->getEmprestimos();
+                if (count($emprestimos) > 0) {
+                    throw new Exception('Não é permitido modificar um usuário que tem empréstimos de chave em aberto.');
+                }  
             } else {
                 $usuario = new Usuario();
                 $usuario->setInstituicao($instituicao);
@@ -167,7 +174,7 @@ class UsuarioSalvar implements RequestHandlerInterface
                 }
             } else { //inserir
                 if (empty($senha)) {
-                    throw new \Exception("Senha não informada.", 1);
+                    throw new Exception("Senha não informada.", 1);
                 }
                 $usuario->setSenha($senha);
                 $this->entityManager->persist($usuario);
@@ -176,7 +183,7 @@ class UsuarioSalvar implements RequestHandlerInterface
             $this->entityManager->flush();
             $rota = '/usuarios';
             $this->clearFlashData();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->defineFlashData([
                 'id' => $id,
                 'login' => $login,

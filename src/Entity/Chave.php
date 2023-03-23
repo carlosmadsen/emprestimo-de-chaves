@@ -100,13 +100,13 @@ class Chave
         return $this->flAtivo == 'S';
     }
 
-    public function getEmprestimo(): Emprestimo
+    public function getEmprestimo(): ?Emprestimo
     {
         return $this->emprestimo;
     }
 
     public function setEmprestimo(Emprestimo $emprestimo): void
     {
-        $this->Emprestimo = $emprestimo;
+        $this->emprestimo = $emprestimo;
     }
 }

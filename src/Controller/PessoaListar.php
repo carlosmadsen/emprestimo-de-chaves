@@ -2,6 +2,8 @@
 
 namespace Emprestimo\Chaves\Controller;
 
+use Exception;
+
 use Emprestimo\Chaves\Entity\Pessoa;
 use Emprestimo\Chaves\Entity\Instituicao;
 
@@ -48,12 +50,12 @@ class PessoaListar implements RequestHandlerInterface
 		try {
 			$dadosUsuario = $this->getSessionUser();
 			if (empty($dadosUsuario)) {
-				throw new \Exception("Não foi possível identificar o usuário.", 1);
+				throw new Exception("Não foi possível identificar o usuário.", 1);
 			}
 			$this->userVerifyAdmin();
 			$idInstituicao = $this->getSessionUserIdInstituicao();
 			if (empty($idInstituicao)) {
-				throw new \Exception("Não foi possível identificar a instituição do usuário atual.", 1);
+				throw new Exception("Não foi possível identificar a instituição do usuário atual.", 1);
 			}
 			$nome = $this->requestPOSTString('nome', $request) ? : (!$newFilter ? $this->getFilterSession('nome') : null);
 			$identificacao = $this->requestPOSTString('identificacao', $request) ? : (!$newFilter ? $this->getFilterSession('identificacao'): null);
@@ -107,7 +109,7 @@ class PessoaListar implements RequestHandlerInterface
 			$html = $this->renderizaHtml('pessoa/listar.php', $dados);
 			return new Response(200, [], $html);
 		}
-		catch (\Exception $e) {
+		catch (Exception $e) {
 			$this->defineFlashMessage('danger', $e->getMessage());
 			return new Response(302, ['Location' => '/login'], null);
 		}

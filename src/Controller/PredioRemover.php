@@ -2,6 +2,8 @@
 
 namespace Emprestimo\Chaves\Controller;
 
+use Exception;
+
 use Emprestimo\Chaves\Entity\Predio;
 use Emprestimo\Chaves\Entity\Chave;
 use Emprestimo\Chaves\Entity\Instituicao;
@@ -40,7 +42,7 @@ class PredioRemover implements RequestHandlerInterface
         $query = $this->entityManager->createQuery($dql);
         $nrChaves = $query->getSingleScalarResult();
         if ($nrChaves > 0) {
-            throw new \Exception('Não é permitido remover o prédio, pois ele está relacionado a '.$nrChaves.' chaves.', 1);
+            throw new Exception('Não é permitido remover o prédio, pois ele está relacionado a '.$nrChaves.' chaves.', 1);
         }
     }
 
@@ -52,20 +54,23 @@ class PredioRemover implements RequestHandlerInterface
             $this->userVerifyAdmin();
             $id = $this->requestGETInteger('id', $request);
             if (is_null($id) || $id === false) {
-                throw new \Exception("Identificação de prédio inválida.", 1);
+                throw new Exception("Identificação de prédio inválida.", 1);
             }
             if (empty($idInstituicao)) {
-                throw new \Exception("Não foi possível identificar a instituição do usuário atual.", 1);
+                throw new Exception("Não foi possível identificar a instituição do usuário atual.", 1);
             }
             $this->verificaTemChaves($id);
             $predio = $this->entityManager->find(Predio::class, $id);
+            if (is_null($predio)) {
+                throw new Exception("Não foi possível localizar o prédio.", 1);
+            }
             if ($predio->getInstituicao()->getId() != $idInstituicao) {
-                throw new \Exception("O prédio selecionado não é da mesma instituição do usuário atual.", 1);
+                throw new Exception("O prédio selecionado não é da mesma instituição do usuário atual.", 1);
             }
             $this->entityManager->remove($predio);
             $this->entityManager->flush();
             $this->defineFlashMessage('success', 'Prédio removido com sucesso.');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->defineFlashMessage('danger', $e->getMessage());
         }
         return new Response(302, ['Location' => '/predios'], null);
