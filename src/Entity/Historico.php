@@ -46,11 +46,11 @@ class Historico
     */
     private DateTime $dtEmprestimo; 
 	/**
-     * @Column(type="datetime", name="dt_devolucao", unique=false, length=20, nullable=false, columnDefinition="TIMESTAMP"), options={"comment":"Data e hora em a devolução foi lançada."})
+     * @Column(type="datetime", name="dt_devolucao", unique=false, length=20, nullable=true, columnDefinition="TIMESTAMP"), options={"comment":"Data e hora em a devolução foi lançada."})
     */
     private DateTime $dtDevolucao; 
 	/**
-     * @Column(type="string", name="nome_pessoa", unique=false, length=255, nullable=true, options={"comment":"Nome da pessoa que pegou a chave emprestada."})
+     * @Column(type="string", name="nome_pessoa", unique=false, length=255, nullable=false, options={"comment":"Nome da pessoa que pegou a chave emprestada."})
     */ 
 	private $nomePessoa;
 	/**
@@ -107,7 +107,7 @@ class Historico
         $this->loginUsuarioDevolucao = $v;
     }
 
-    public function getLoginUsuarioDevolucao(): string
+    public function getLoginUsuarioDevolucao(): ?string
     {
         return $this->loginUsuarioDevolucao;
     }
@@ -117,7 +117,7 @@ class Historico
         $this->nomeUsuarioDevolucao = $v;
     }
 
-    public function getNomeUsuarioDevolucao(): string
+    public function getNomeUsuarioDevolucao(): ?string
     {
         return $this->nomeUsuarioDevolucao;
     }
@@ -137,7 +137,7 @@ class Historico
         $this->dtDevolucao = $v;
     }
 
-    public function getDtDevolucao(): DateTime
+    public function getDtDevolucao(): ?DateTime
     {
         return $this->dtDevolucao;
     } 
@@ -171,4 +171,8 @@ class Historico
     {
         return $this->nomePredio;
     } 
+
+    public function foiDevolvida() {
+        return !is_null($this->nomeUsuarioDevolucao);
+    }
 }

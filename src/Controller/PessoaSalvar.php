@@ -114,7 +114,9 @@ class PessoaSalvar implements RequestHandlerInterface
             }
             $this->verificaDuplicacaoNome($nome, $idInstituicao, $id);
             $this->verificaDuplicacaoDocumento($documento, $idInstituicao, $labelDocumento, $id);
-            $this->verificaDuplicacaoIdentificacao($identificacao, $idInstituicao, $labelIdentificacao, $id);
+            if (!empty($labelIdentificacao)) {
+                $this->verificaDuplicacaoIdentificacao($identificacao, $idInstituicao, $labelIdentificacao, $id);
+            }
             $flAlterar = (!is_null($id) && $id !== false);
             if ($flAlterar) {
                 $pessoa = $this->entityManager->find(Pessoa::class, $id);

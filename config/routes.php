@@ -1,6 +1,7 @@
 <?php
 
 use Emprestimo\Chaves\Controller\{
+    HistoricoListar,
     EmprestimosListar,
     EmprestimoFormulario,
     EmprestimoEmprestar,
@@ -32,6 +33,7 @@ use Emprestimo\Chaves\Controller\{
 
 $rotas = [
     '' => EmprestimosListar::class,
+    '/historicos' => HistoricoListar::class,
     '/emprestimos' => EmprestimosListar::class,
     '/novo-emprestimo' => EmprestimoFormulario::class,
     '/emprestar' => EmprestimoEmprestar::class,
