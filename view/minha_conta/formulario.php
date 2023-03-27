@@ -74,9 +74,6 @@
         </div> 
 
         <button class="btn btn-primary">Salvar</button>
-        <a href="/usuarios" class="btn btn-secondary">
-            Voltar
-        </a>
     </form>
 
 <?php include __DIR__ . '/../fim-html.php'; ?>

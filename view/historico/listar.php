@@ -4,12 +4,31 @@ require __DIR__ . '/../inicio-html.php'; ?>
 	<form  action="/historicos?filtrar=1" method="post" >
 
 	<div class="form-row">		
-	
 
 	<div class="form-group col-md-2 ">
-		<label for="nome">Número da Chave</label>
+		<label for="numero">Número da Chave</label>
 		<input type="text" class="form-control" id="numero" name="numeroChave" value="<?= $numeroChave; ?>" >
 	</div>	
+
+	<div class="form-group col-md-2 ">
+		<label for="predio">Prédio</label>
+		<input type="text" class="form-control" id="predio" name="predio" value="<?= $predio; ?>" >
+	</div>
+
+	<div class="form-group col-md-2 ">
+		<label for="pessoa">Nome da pessoa</label>
+		<input type="text" class="form-control" id="pessoa" name="pessoa" value="<?= $pessoa; ?>" >
+	</div>
+
+	<div class="form-group col-md-2 ">
+		<label for="data_inicial">Data inicial</label>
+		<input type="date" class="form-control" id="data_inicial" name="data_inicial" value="<?= $dataInicial; ?>" >
+	</div>
+	
+	<div class="form-group col-md-2 ">
+		<label for="data_final">Data final</label>
+		<input type="date" class="form-control" id="data_final" name="data_final" value="<?= $dataFinal; ?>" >
+	</div>
 
 	<div class="form-group col-md-2">
 		<label></label>
@@ -19,15 +38,18 @@ require __DIR__ . '/../inicio-html.php'; ?>
 				<a href="/historicos?limparFiltro=1" class="btn btn-secondary mb-2" >
 				Limpar
 				</a>
-				<?php endif; ?>
+				<?php endif; ?>				
 			</div>
 		</div>
 
 	</div>
 	</form>
 
-	<?php if ($temPesquisa) : ?>
+	<?php if ($temPesquisa) : ?>		
 		<?php if (count($historicos) > 0) : ?>
+			<form  action="/historicos-csv" method="post" >
+			<button type="submit" class="btn btn-primary mb-2">Baixar em CSV</button>
+			</form>
 
 			<table class="table  table-bordered">
 			<thead >
@@ -36,7 +58,7 @@ require __DIR__ . '/../inicio-html.php'; ?>
 				<th scope="col">Devolução</th>
 				<th scope="col">Número da Chave</th>
 				<th scope="col">Prédio</th>
-				<th scope="col">Pessoa</th>
+				<th scope="col">Nome da pessoa</th>
 				</tr>
 			</thead>
 			<tbody>

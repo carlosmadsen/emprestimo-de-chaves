@@ -47,8 +47,3 @@ Em seguida reinicie o servidor web:
 ```
 php -S localhost:8080 -t public
 ```
-## TODO:
-1. Criar app de empréstimo de chaves. 
-2. Criar app de histórico de empréstimos.
-3. Colocar paginação nas listagens.
-4. Arrumar html de rodapé e tela de login.
